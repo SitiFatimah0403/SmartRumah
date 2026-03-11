@@ -21,13 +21,18 @@ function getEligibleSchemes(user) {
 
   });
 
-  // Step 2 — Extract scheme names
-  const schemeNames = eligibleSchemes.map(s => s.name);
+  // Step 2 — Find projects under those schemes
+  const matchingProjects = housingProjects.filter(project => {
 
-  // Step 3 — Find projects under those schemes
-  const matchingProjects = housingProjects.filter(project =>
-    schemeNames.includes(project.scheme)
-  );
+    const schemeMatch = eligibleSchemes.some(
+      scheme => scheme.name === project.scheme
+    );
+
+    const locationMatch = project.state === user.location;
+
+    return schemeMatch && locationMatch;
+
+  });
 
   return {
     eligibleSchemes,
