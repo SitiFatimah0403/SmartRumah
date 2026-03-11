@@ -1,0 +1,193 @@
+{
+  "housingProjects": [
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Bandar Bukit Mahkota",
+      "location": "Kajang",
+      "state": "Selangor",
+      "price": 264060,
+      "status": "Open for Sale"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Cyberjaya 2",
+      "location": "Cyberjaya",
+      "state": "Selangor",
+      "price": 274000,
+      "status": "Fully Sold"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Cyberjaya",
+      "location": "Cyberjaya",
+      "state": "Selangor",
+      "price": 220000,
+      "status": "Fully Sold"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Selangorku Lakefront Homes",
+      "location": "Cyberjaya",
+      "state": "Selangor",
+      "price": 280000,
+      "status": "Fully Sold"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Nexus Kajang",
+      "location": "Kajang",
+      "state": "Selangor",
+      "price": 288000,
+      "status": "Fully Sold"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Astrum Ampang",
+      "location": "Ampang",
+      "state": "Selangor",
+      "price": 250000,
+      "status": "Open for Sale"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Kajang Utama",
+      "location": "Kajang",
+      "state": "Selangor",
+      "price": 283500,
+      "status": "Open for Sale"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Alam Damai",
+      "location": "Kuala Lumpur",
+      "state": "Kuala Lumpur",
+      "price": 306000,
+      "status": "Limited Unit"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Brickfields",
+      "location": "Kuala Lumpur",
+      "state": "Kuala Lumpur",
+      "price": 322420,
+      "status": "Fully Sold"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "Residensi Jalan Jubilee",
+      "location": "Kuala Lumpur",
+      "state": "Kuala Lumpur",
+      "price": 373500,
+      "status": "Limited Unit"
+    },
+    {
+      "scheme": "PR1MA",
+      "projectName": "SkyAwani PRIMA Residences",
+      "location": "Kuala Lumpur",
+      "state": "Kuala Lumpur",
+      "price": 390000,
+      "status": "Open for Application"
+    },
+
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Tepian Tasik",
+      "location": "Bandar Tun Razak",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 593,
+      "sizeSqft": 869
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Metropolitan Kepong",
+      "location": "Kepong",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 552,
+      "sizeSqft": 800
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Awani 6",
+      "location": "Setiawangsa",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 638,
+      "sizeSqft": 800
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Kerinchi Ria",
+      "location": "Seputeh",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 336,
+      "sizeSqft": 802
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Wilayah Desa Tasik (902kps)",
+      "location": "Bandar Tun Razak",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 717,
+      "sizeSqft": 902
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Wilayah Desa Tasik (908kps)",
+      "location": "Bandar Tun Razak",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 193,
+      "sizeSqft": 908
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi J Satin Phase 2",
+      "location": "Wangsa Maju",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 1532,
+      "sizeSqft": 800
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Desa Timur",
+      "location": "Bukit Bintang",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 1218,
+      "sizeSqft": 800
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi J Satin Phase 1",
+      "location": "Wangsa Maju",
+      "state": "Kuala Lumpur",
+      "price": 300000,
+      "units": 2068,
+      "sizeSqft": 800
+    },
+
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Wilayah Sentral",
+      "location": "Putrajaya",
+      "state": "Putrajaya",
+      "price": 300000,
+      "units": 1336,
+      "sizeSqft": 850
+    },
+    {
+      "scheme": "Residensi Wilayah",
+      "projectName": "Residensi Cengkih",
+      "location": "Putrajaya",
+      "state": "Putrajaya",
+      "price": 300000,
+      "units": 724,
+      "sizeSqft": 800
+    }
+  ]
+}
