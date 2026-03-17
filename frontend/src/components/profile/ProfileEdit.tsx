@@ -1,20 +1,17 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
-  ArrowRight,
   Briefcase,
   CalendarDays,
-  CheckCircle2,
+  Check,
   ChevronDown,
   Eye,
   Globe,
   Heart,
-  HelpCircle,
   Home,
-  House,
   IdCard,
   Info,
-  Landmark,
   Mail,
   MapPin,
   Minus,
@@ -25,6 +22,42 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+
+type SchemeKey = "prima" | "selangorku" | "myhome" | "rumawip" | "spb";
+
+type FormData = {
+  fullName: string;
+  nric: string;
+  email: string;
+  age: string;
+  password: string;
+  confirmPassword: string;
+  citizenship: string;
+  race: string;
+  otherRace: string;
+  maritalStatus: string;
+  employmentStatus: string;
+  jobSector: string;
+  yearsOfEmployment: number;
+  workplaceLocation: string;
+  preferredState: string;
+  maxBudget: number;
+  commuteRange: string;
+  priorities: string[];
+  interestRate: string;
+  loanTenure: string;
+  downpayment: string;
+  firstTimeHomebuyer: boolean;
+  householdIncome: string;
+  dependents: number;
+  householdSize: string;
+  ownResidentialProperty: string;
+  applyingJointly: boolean;
+  spouseIncome: string;
+  currentResidentialState: string;
+  financingStatus: string;
+  selectedSchemes: SchemeKey[];
+};
 
 const states = [
   "Kuala Lumpur",
@@ -45,49 +78,39 @@ const states = [
   "Labuan",
 ];
 
-type SchemeKey = "prima" | "selangorku" | "myhome" | "rumawip" | "spb";
-
 const schemeOptions: {
   key: SchemeKey;
   title: string;
   subtitle: string;
-  icon: React.ReactNode;
 }[] = [
-  { key: "prima", title: "PR1MA", subtitle: "Affordable Urban Living", icon: <BuildingIcon /> },
-  { key: "selangorku", title: "Rumah Selangorku", subtitle: "Selangor State Housing", icon: <House className="h-7 w-7" /> },
-  { key: "myhome", title: "MyHome", subtitle: "Private Affordable Housing", icon: <Home className="h-7 w-7" /> },
-  { key: "rumawip", title: "RUMAWIP", subtitle: "Federal Territory Residency", icon: <Landmark className="h-7 w-7" /> },
-  { key: "spb", title: "SPB", subtitle: "Youth Housing Scheme", icon: <Briefcase className="h-7 w-7" /> },
+  { key: "prima", title: "PR1MA", subtitle: "Affordable Urban Living" },
+  { key: "selangorku", title: "Rumah Selangorku", subtitle: "Selangor State Housing" },
+  { key: "myhome", title: "MyHome", subtitle: "Private Affordable Housing" },
+  { key: "rumawip", title: "RUMAWIP", subtitle: "Federal Territory Residency" },
+  { key: "spb", title: "SPB", subtitle: "Youth Housing Scheme" },
 ];
 
-export default function SmartRumahCombinedPage() {
-  const goToLogin = () => {
-    window.location.href = "/login";
-  };
+export default function ProfileEdit() {
+  const navigate = useNavigate();
 
-  const goToHome = () => {
-    window.location.href = "/";
-  };
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    nric: "",
-    email: "",
-    age: "",
-    password: "",
-    confirmPassword: "",
+  const [formData, setFormData] = useState<FormData>({
+    fullName: "Luqman Hakim",
+    nric: "950101-14-5051",
+    email: "alex@email.com",
+    age: "28",
+    password: "password123",
+    confirmPassword: "password123",
     citizenship: "Malaysian",
     race: "Bumiputera",
     otherRace: "",
     maritalStatus: "Married",
-
     employmentStatus: "Employed",
     jobSector: "Private Sector",
     yearsOfEmployment: 5,
     workplaceLocation: "KLCC, Kuala Lumpur",
-
     preferredState: "Kuala Lumpur",
     maxBudget: 450000,
     commuteRange: "10km",
@@ -95,30 +118,28 @@ export default function SmartRumahCombinedPage() {
     interestRate: "3.8%",
     loanTenure: "30",
     downpayment: "10%",
-
     firstTimeHomebuyer: true,
     householdIncome: "5500",
     dependents: 2,
     householdSize: "3",
     ownResidentialProperty: "No",
     applyingJointly: true,
-    spouseIncome: "",
+    spouseIncome: "3500",
     currentResidentialState: "Selangor",
     financingStatus: "Not applied yet",
-
-    selectedSchemes: ["prima", "selangorku"] as SchemeKey[],
+    selectedSchemes: ["prima", "selangorku"],
   });
 
-  const handleChange = <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
+  const handleChange = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const togglePriority = (label: string) => {
+  const togglePriority = (item: string) => {
     setFormData((prev) => ({
       ...prev,
-      priorities: prev.priorities.includes(label)
-        ? prev.priorities.filter((item) => item !== label)
-        : [...prev.priorities, label],
+      priorities: prev.priorities.includes(item)
+        ? prev.priorities.filter((p) => p !== item)
+        : [...prev.priorities, item],
     }));
   };
 
@@ -126,7 +147,7 @@ export default function SmartRumahCombinedPage() {
     setFormData((prev) => ({
       ...prev,
       selectedSchemes: prev.selectedSchemes.includes(scheme)
-        ? prev.selectedSchemes.filter((item) => item !== scheme)
+        ? prev.selectedSchemes.filter((s) => s !== scheme)
         : [...prev.selectedSchemes, scheme],
     }));
   };
@@ -139,115 +160,57 @@ export default function SmartRumahCombinedPage() {
   const toggleAllSchemes = () => {
     setFormData((prev) => ({
       ...prev,
-      selectedSchemes: allSchemesSelected ? [] : schemeOptions.map((item) => item.key),
+      selectedSchemes: allSchemesSelected ? [] : schemeOptions.map((s) => s.key),
     }));
   };
 
-  const completedSections = useMemo(() => {
-    let score = 0;
-    if (formData.fullName && formData.email && formData.nric) score += 1;
-    if (formData.employmentStatus && formData.jobSector) score += 1;
-    if (formData.preferredState && formData.maxBudget) score += 1;
-    if (formData.householdIncome && formData.financingStatus) score += 1;
-    if (formData.selectedSchemes.length > 0) score += 1;
-    return score;
-  }, [formData]);
-
-  const sectionTitleClass =
-    "mb-1 text-xs font-bold uppercase tracking-[0.2em] text-emerald-500";
-  const cardClass =
-    "rounded-3xl border border-white/5 bg-slate-900/60 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-xl";
+  const sectionClass =
+    "rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur-xl";
   const inputClass =
     "h-14 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 text-sm text-white outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-500";
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <div className="mx-auto min-h-screen max-w-7xl bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.14),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.08),transparent_26%)]">
-        <header className="sticky top-0 z-30 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={goToLogin}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <div>
-                <p className="text-sm font-semibold text-white">SmartRumah</p>
-                <p className="text-xs text-slate-400">Complete onboarding profile</p>
-              </div>
-            </div>
-
-            <div className="hidden w-full max-w-md px-6 md:block">
-              <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="font-bold uppercase tracking-[0.18em] text-emerald-500">Progress</span>
-                <span className="text-slate-400">{completedSections} of 5 sections completed</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-emerald-500 transition-all"
-                  style={{ width: `${(completedSections / 5) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10">
-              <HelpCircle className="h-5 w-5" />
+      <div className="mx-auto min-h-screen max-w-6xl bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.12),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(16,185,129,0.08),transparent_26%)]">
+        <header className="sticky top-0 z-30 border-b border-white/5 bg-slate-950/85 backdrop-blur-xl">
+          <div className="flex items-center justify-between px-4 py-4 md:px-6">
+            <button
+              type="button"
+              onClick={() => navigate("/profile")}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 transition hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
             </button>
+
+            <div className="text-center">
+              <h1 className="text-lg font-extrabold tracking-tight">Edit Profile</h1>
+              <p className="text-xs text-slate-400">Update your SmartRumah details</p>
+            </div>
+
+            <div className="w-11" />
           </div>
         </header>
 
-        <main className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-6 md:px-6 lg:grid-cols-[1.35fr_0.65fr]">
+        <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-6 md:px-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-6">
-            <section className={cardClass}>
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div>
-                  <p className={sectionTitleClass}>Step 1</p>
-                  <h2 className="text-2xl font-extrabold tracking-tight">Personal Information</h2>
-                  <p className="mt-2 max-w-2xl text-sm text-slate-400">
-                    Provide your basic details to personalize your home ownership journey.
-                  </p>
-                </div>
-                <Badge text="Step 1 of 5" />
-              </div>
+            <section className={sectionClass}>
+              <SectionHeader title="Personal Information" subtitle="Basic identity and account details." />
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Field label="Full Name" icon={<User className="h-4 w-4" />}>
-                  <input
-                    className={inputClass}
-                    placeholder="e.g., Luqman Hakim"
-                    value={formData.fullName}
-                    onChange={(e) => handleChange("fullName", e.target.value)}
-                  />
+                  <input className={inputClass} value={formData.fullName} onChange={(e) => handleChange("fullName", e.target.value)} />
                 </Field>
 
                 <Field label="NRIC" icon={<IdCard className="h-4 w-4" />}>
-                  <input
-                    className={inputClass}
-                    placeholder="e.g., 950101-14-5051"
-                    value={formData.nric}
-                    onChange={(e) => handleChange("nric", e.target.value)}
-                  />
+                  <input className={inputClass} value={formData.nric} onChange={(e) => handleChange("nric", e.target.value)} />
                 </Field>
 
                 <Field label="Email Address" icon={<Mail className="h-4 w-4" />}>
-                  <input
-                    type="email"
-                    className={inputClass}
-                    placeholder="e.g., alex@email.com"
-                    value={formData.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                  />
+                  <input type="email" className={inputClass} value={formData.email} onChange={(e) => handleChange("email", e.target.value)} />
                 </Field>
 
                 <Field label="Age" icon={<CalendarDays className="h-4 w-4" />}>
-                  <input
-                    type="number"
-                    className={inputClass}
-                    placeholder="e.g., 28"
-                    value={formData.age}
-                    onChange={(e) => handleChange("age", e.target.value)}
-                  />
+                  <input type="number" className={inputClass} value={formData.age} onChange={(e) => handleChange("age", e.target.value)} />
                 </Field>
 
                 <Field label="Password" icon={<Eye className="h-4 w-4" />}>
@@ -255,7 +218,6 @@ export default function SmartRumahCombinedPage() {
                     <input
                       type={showPassword ? "text" : "password"}
                       className={`${inputClass} pr-12`}
-                      placeholder="Enter your password"
                       value={formData.password}
                       onChange={(e) => handleChange("password", e.target.value)}
                     />
@@ -274,7 +236,6 @@ export default function SmartRumahCombinedPage() {
                     <input
                       type={showConfirmPassword ? "text" : "password"}
                       className={`${inputClass} pr-12`}
-                      placeholder="Confirm your password"
                       value={formData.confirmPassword}
                       onChange={(e) => handleChange("confirmPassword", e.target.value)}
                     />
@@ -289,7 +250,7 @@ export default function SmartRumahCombinedPage() {
                 </Field>
               </div>
 
-              <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Field label="Citizenship" icon={<Globe className="h-4 w-4" />}>
                   <div className="flex rounded-2xl border border-slate-700 bg-slate-900/70 p-1">
                     {["Malaysian", "Non-Malaysian"].map((option) => (
@@ -298,9 +259,7 @@ export default function SmartRumahCombinedPage() {
                         type="button"
                         onClick={() => handleChange("citizenship", option)}
                         className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                          formData.citizenship === option
-                            ? "bg-emerald-500 text-white"
-                            : "text-slate-400 hover:text-white"
+                          formData.citizenship === option ? "bg-emerald-500 text-white" : "text-slate-400 hover:text-white"
                         }`}
                       >
                         {option}
@@ -353,17 +312,8 @@ export default function SmartRumahCombinedPage() {
               )}
             </section>
 
-            <section className={cardClass}>
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div>
-                  <p className={sectionTitleClass}>Step 2</p>
-                  <h2 className="text-2xl font-extrabold tracking-tight">Employment Details</h2>
-                  <p className="mt-2 text-sm text-slate-400">
-                    Tell us about your work profile so we can estimate eligibility more accurately.
-                  </p>
-                </div>
-                <Badge text="Step 2 of 5" />
-              </div>
+            <section className={sectionClass}>
+              <SectionHeader title="Employment Details" subtitle="Your current work and location profile." />
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Field label="Employment Status" icon={<Briefcase className="h-4 w-4" />}>
@@ -399,9 +349,9 @@ export default function SmartRumahCombinedPage() {
 
                 <Field label="Years of Employment" icon={<CalendarDays className="h-4 w-4" />}>
                   <div className="rounded-2xl border border-slate-700 bg-slate-900/60 p-4">
-                    <div className="mb-2 flex items-center justify-between text-sm font-semibold text-white">
-                      <span>{formData.yearsOfEmployment} years</span>
-                      <span className="text-slate-400">Experience</span>
+                    <div className="mb-3 flex items-center justify-between text-sm font-semibold">
+                      <span>{formData.yearsOfEmployment}</span>
+                      <span className="text-slate-400">Years</span>
                     </div>
                     <input
                       type="range"
@@ -414,9 +364,9 @@ export default function SmartRumahCombinedPage() {
                   </div>
                 </Field>
 
-                <Field label="Workplace Location" icon={<MapPin className="h-4 w-4" />}>
+                <Field label="Workplace Location" icon={<Search className="h-4 w-4" />}>
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />
+                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-400" />
                     <input
                       className={`${inputClass} pl-11`}
                       value={formData.workplaceLocation}
@@ -426,30 +376,21 @@ export default function SmartRumahCombinedPage() {
                 </Field>
               </div>
 
-              <div className="mt-5 h-56 overflow-hidden rounded-3xl border border-white/5 bg-[radial-gradient(rgba(16,185,129,0.22)_1px,transparent_1px)] [background-size:20px_20px]">
-                <div className="relative flex h-full items-center justify-center bg-slate-950/40">
-                  <div className="absolute left-4 top-4 rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-950">
-                    Live preview
+              <div className="mt-5 h-52 overflow-hidden rounded-3xl border border-white/5 bg-[radial-gradient(rgba(16,185,129,0.22)_1px,transparent_1px)] [background-size:20px_20px]">
+                <div className="relative flex h-full items-center justify-center bg-slate-950/50">
+                  <div className="absolute bottom-3 left-3 rounded-md bg-emerald-500 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-950">
+                    Live Preview
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <MapPin className="h-12 w-12 text-emerald-500 drop-shadow-[0_0_14px_rgba(16,185,129,0.6)]" />
-                    <p className="text-sm font-semibold text-slate-200">{formData.workplaceLocation}</p>
+                    <MapPin className="h-12 w-12 text-emerald-500 drop-shadow-[0_0_14px_rgba(16,185,129,0.65)]" />
+                    <p className="text-sm font-semibold">{formData.workplaceLocation}</p>
                   </div>
                 </div>
               </div>
             </section>
 
-            <section className={cardClass}>
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div>
-                  <p className={sectionTitleClass}>Step 3</p>
-                  <h2 className="text-2xl font-extrabold tracking-tight">Property Preferences</h2>
-                  <p className="mt-2 text-sm text-slate-400">
-                    Tailor your property match with location, budget, commute, and financing preferences.
-                  </p>
-                </div>
-                <Badge text="Step 3 of 5" />
-              </div>
+            <section className={sectionClass}>
+              <SectionHeader title="Property Preferences" subtitle="Refine budget, commute, and property priorities." />
 
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 <Field label="Preferred State" icon={<MapPin className="h-4 w-4" />}>
@@ -467,13 +408,13 @@ export default function SmartRumahCombinedPage() {
                   </div>
                 </Field>
 
-                <div className="rounded-3xl border border-white/5 bg-slate-900/40 p-4">
+                <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-4">
                   <div className="mb-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-400">
-                      <Wallet className="h-4 w-4 text-emerald-500" />
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                      <Wallet className="h-4 w-4 text-emerald-400" />
                       Max Budget
                     </div>
-                    <span className="text-xl font-extrabold text-emerald-500">
+                    <span className="text-xl font-extrabold text-emerald-400">
                       RM {formData.maxBudget.toLocaleString()}
                     </span>
                   </div>
@@ -486,44 +427,34 @@ export default function SmartRumahCombinedPage() {
                     onChange={(e) => handleChange("maxBudget", Number(e.target.value))}
                     className="w-full accent-emerald-500"
                   />
-                  <div className="mt-2 flex justify-between text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                  <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
                     <span>RM 100k</span>
                     <span>RM 1.0M</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
-                {["5km", "10km", "20km", "Any"].map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => handleChange("commuteRange", option)}
-                    className={toggleCardClass(formData.commuteRange === option)}
-                  >
-                    <div className="mb-2 flex justify-center">
-                      {option === "20km" ? (
-                        <Train className="h-5 w-5" />
-                      ) : option === "Any" ? (
-                        <MapPin className="h-5 w-5" />
-                      ) : (
-                        <Briefcase className="h-5 w-5" />
-                      )}
-                    </div>
-                    {option}
-                  </button>
-                ))}
+              <div className="mt-5">
+                <Field label="Commute Range" icon={<Train className="h-4 w-4" />}>
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                    {["5km", "10km", "20km", "Any"].map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => handleChange("commuteRange", option)}
+                        className={toggleCardClass(formData.commuteRange === option)}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
               </div>
 
               <div className="mt-5">
-                <Field label="What Matters Most" icon={<CheckCircle2 className="h-4 w-4" />}>
+                <Field label="What Matters Most" icon={<Heart className="h-4 w-4" />}>
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {[
-                      "Affordable Price",
-                      "Public Transport",
-                      "Nearby Schools",
-                      "Lifestyle",
-                    ].map((item) => (
+                    {["Affordable Price", "Public Transport", "Nearby Schools", "Lifestyle"].map((item) => (
                       <button
                         key={item}
                         type="button"
@@ -539,48 +470,27 @@ export default function SmartRumahCombinedPage() {
 
               <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
                 <MiniStat label="Interest Rate" value={formData.interestRate} />
-                <MiniStat label="Loan Tenure" value={formData.loanTenure} suffix="years" />
+                <MiniStat label="Loan Tenure" value={formData.loanTenure} suffix="Years" />
                 <MiniStat label="Downpayment" value={formData.downpayment} />
               </div>
             </section>
 
-            <section className={cardClass}>
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div>
-                  <p className={sectionTitleClass}>Step 4</p>
-                  <h2 className="text-2xl font-extrabold tracking-tight">Housing Scheme Eligibility</h2>
-                  <p className="mt-2 text-sm text-slate-400">
-                    Check household, ownership, and financing details used by housing schemes.
-                  </p>
-                </div>
-                <Badge text="Step 4 of 5" />
-              </div>
+            <section className={sectionClass}>
+              <SectionHeader title="Housing Scheme Eligibility" subtitle="Update household and financing details." />
 
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 <div className="space-y-5">
-                  <Field label="First-time Homebuyer" icon={<Home className="h-4 w-4" />}>
+                  <Field label="First-Time Homebuyer" icon={<Home className="h-4 w-4" />}>
                     <button
                       type="button"
                       onClick={() => handleChange("firstTimeHomebuyer", !formData.firstTimeHomebuyer)}
                       className={`flex h-14 w-full items-center justify-between rounded-2xl border px-4 transition ${
-                        formData.firstTimeHomebuyer
-                          ? "border-emerald-500 bg-emerald-500/10"
-                          : "border-slate-700 bg-slate-900/60"
+                        formData.firstTimeHomebuyer ? "border-emerald-500 bg-emerald-500/10" : "border-slate-700 bg-slate-900/50"
                       }`}
                     >
-                      <div className="text-left">
-                        <p className="text-sm font-semibold text-white">I have never owned a residential property before</p>
-                      </div>
-                      <div
-                        className={`relative h-7 w-14 rounded-full transition ${
-                          formData.firstTimeHomebuyer ? "bg-emerald-500" : "bg-slate-700"
-                        }`}
-                      >
-                        <div
-                          className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
-                            formData.firstTimeHomebuyer ? "right-1" : "left-1"
-                          }`}
-                        />
+                      <span className="text-sm font-semibold">I have never owned a residential property before</span>
+                      <div className={`relative h-7 w-14 rounded-full ${formData.firstTimeHomebuyer ? "bg-emerald-500" : "bg-slate-700"}`}>
+                        <div className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${formData.firstTimeHomebuyer ? "right-1" : "left-1"}`} />
                       </div>
                     </button>
                   </Field>
@@ -590,7 +500,6 @@ export default function SmartRumahCombinedPage() {
                       className={inputClass}
                       value={formData.householdIncome}
                       onChange={(e) => handleChange("householdIncome", e.target.value.replace(/[^\d]/g, ""))}
-                      placeholder="e.g. 5500"
                     />
                   </Field>
 
@@ -631,7 +540,7 @@ export default function SmartRumahCombinedPage() {
                     </div>
                   </Field>
 
-                  <Field label="Do you own any residential property?" icon={<House className="h-4 w-4" />}>
+                  <Field label="Own any residential property?" icon={<Home className="h-4 w-4" />}>
                     <div className="grid grid-cols-2 gap-3">
                       {["No", "Yes"].map((option) => (
                         <button
@@ -648,18 +557,10 @@ export default function SmartRumahCombinedPage() {
 
                   <Field label="Applying jointly with spouse?" icon={<Heart className="h-4 w-4" />}>
                     <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => handleChange("applyingJointly", false)}
-                        className={toggleButtonClass(!formData.applyingJointly)}
-                      >
+                      <button type="button" onClick={() => handleChange("applyingJointly", false)} className={toggleButtonClass(!formData.applyingJointly)}>
                         No
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChange("applyingJointly", true)}
-                        className={toggleButtonClass(formData.applyingJointly)}
-                      >
+                      <button type="button" onClick={() => handleChange("applyingJointly", true)} className={toggleButtonClass(formData.applyingJointly)}>
                         Yes
                       </button>
                     </div>
@@ -671,7 +572,6 @@ export default function SmartRumahCombinedPage() {
                         className={inputClass}
                         value={formData.spouseIncome}
                         onChange={(e) => handleChange("spouseIncome", e.target.value.replace(/[^\d]/g, ""))}
-                        placeholder="e.g. 3500"
                       />
                     </Field>
                   )}
@@ -691,7 +591,7 @@ export default function SmartRumahCombinedPage() {
                     </div>
                   </Field>
 
-                  <Field label="Financing Status" icon={<Landmark className="h-4 w-4" />}>
+                  <Field label="Housing Loan / Financing Status" icon={<Wallet className="h-4 w-4" />}>
                     <div className="grid grid-cols-2 gap-2">
                       {[
                         "Not applied yet",
@@ -714,40 +614,20 @@ export default function SmartRumahCombinedPage() {
               </div>
             </section>
 
-            <section className={cardClass}>
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div>
-                  <p className={sectionTitleClass}>Step 5</p>
-                  <h2 className="text-2xl font-extrabold tracking-tight">Housing Scheme Interest</h2>
-                  <p className="mt-2 text-sm text-slate-400">
-                    Select the government housing schemes you want SmartRumah to check for eligibility.
-                  </p>
-                </div>
-                <Badge text="Step 5 of 5" />
-              </div>
+            <section className={sectionClass}>
+              <SectionHeader title="Housing Scheme Interest" subtitle="Choose which schemes to keep on your profile." />
 
               <div className="mb-5 flex items-center justify-between rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-emerald-500/10 p-3 text-emerald-400">
-                    <CheckCircle2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white">Select All</h3>
-                    <p className="text-xs text-slate-400">Toggle all available schemes</p>
-                  </div>
+                <div>
+                  <h3 className="font-bold">Select All</h3>
+                  <p className="text-xs text-slate-400">Toggle all housing schemes</p>
                 </div>
                 <button
                   type="button"
                   onClick={toggleAllSchemes}
-                  className={`relative h-7 w-14 rounded-full transition ${
-                    allSchemesSelected ? "bg-emerald-500" : "bg-slate-700"
-                  }`}
+                  className={`relative h-7 w-14 rounded-full ${allSchemesSelected ? "bg-emerald-500" : "bg-slate-700"}`}
                 >
-                  <div
-                    className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
-                      allSchemesSelected ? "right-1" : "left-1"
-                    }`}
-                  />
+                  <div className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${allSchemesSelected ? "right-1" : "left-1"}`} />
                 </button>
               </div>
 
@@ -760,83 +640,74 @@ export default function SmartRumahCombinedPage() {
                       type="button"
                       onClick={() => toggleScheme(scheme.key)}
                       className={`flex items-center justify-between rounded-3xl border p-4 text-left transition ${
-                        active
-                          ? "border-emerald-500/40 bg-emerald-500/10 ring-1 ring-emerald-500/20"
-                          : "border-white/5 bg-slate-900/40 hover:border-emerald-500/20"
+                        active ? "border-emerald-500/40 bg-emerald-500/10" : "border-white/5 bg-slate-900/40 hover:border-emerald-500/20"
                       }`}
                     >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
-                            active ? "bg-white text-slate-900" : "bg-slate-800 text-white"
-                          }`}
-                        >
-                          {scheme.icon}
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-white">{scheme.title}</h4>
-                          <p className="text-xs text-slate-400">{scheme.subtitle}</p>
-                        </div>
+                      <div>
+                        <h4 className="font-bold">{scheme.title}</h4>
+                        <p className="text-xs text-slate-400">{scheme.subtitle}</p>
                       </div>
                       <div
                         className={`flex h-6 w-6 items-center justify-center rounded-full border-2 ${
                           active ? "border-emerald-500 bg-emerald-500 text-white" : "border-slate-600"
                         }`}
                       >
-                        {active && <CheckCircle2 className="h-4 w-4" />}
+                        {active && <Check className="h-4 w-4" />}
                       </div>
                     </button>
                   );
                 })}
               </div>
+
+              <div className="mt-5 flex gap-3 rounded-3xl border border-emerald-500/15 bg-slate-900/50 p-4">
+                <div className="rounded-full bg-emerald-500/15 p-2 text-emerald-400">
+                  <Info className="h-4 w-4" />
+                </div>
+                <p className="text-sm leading-relaxed text-slate-300">
+                  SmartRumah uses these preferences to personalize your profile and improve housing recommendations.
+                </p>
+              </div>
             </section>
           </div>
 
           <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-            <section className={cardClass}>
-              <p className={sectionTitleClass}>Summary</p>
-              <h3 className="text-xl font-extrabold tracking-tight">Profile snapshot</h3>
-              <div className="mt-5 space-y-3 text-sm">
-                <SummaryRow label="Applicant" value={formData.fullName || "Not entered"} />
-                <SummaryRow label="Citizenship" value={formData.citizenship} />
+            <section className={sectionClass}>
+              <SectionHeader title="Profile Summary" subtitle="Quick overview of your updated details." />
+              <div className="space-y-3 text-sm">
+                <SummaryRow label="Name" value={formData.fullName} />
+                <SummaryRow label="Email" value={formData.email} />
                 <SummaryRow label="Employment" value={formData.employmentStatus} />
-                <SummaryRow label="Workplace" value={formData.workplaceLocation} />
-                <SummaryRow label="Preferred State" value={formData.preferredState} />
+                <SummaryRow label="State" value={formData.preferredState} />
                 <SummaryRow label="Budget" value={`RM ${formData.maxBudget.toLocaleString()}`} />
-                <SummaryRow label="Household Income" value={`RM ${Number(formData.householdIncome || 0).toLocaleString()}`} />
+                <SummaryRow label="Income" value={`RM ${Number(formData.householdIncome || 0).toLocaleString()}`} />
                 <SummaryRow label="Financing" value={formData.financingStatus} />
               </div>
             </section>
 
-            <section className={cardClass}>
-              <p className={sectionTitleClass}>Selected schemes</p>
-              <h3 className="text-xl font-extrabold tracking-tight">Eligibility targets</h3>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {formData.selectedSchemes.length > 0 ? (
-                  schemeOptions
-                    .filter((item) => formData.selectedSchemes.includes(item.key))
-                    .map((item) => (
-                      <span
-                        key={item.key}
-                        className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-300"
-                      >
-                        {item.title}
-                      </span>
-                    ))
-                ) : (
-                  <span className="text-sm text-slate-400">No scheme selected yet.</span>
-                )}
+            <section className={sectionClass}>
+              <SectionHeader title="Selected Schemes" subtitle="Schemes attached to this profile." />
+              <div className="flex flex-wrap gap-2">
+                {formData.selectedSchemes.map((schemeKey) => {
+                  const scheme = schemeOptions.find((item) => item.key === schemeKey);
+                  return (
+                    <span
+                      key={schemeKey}
+                      className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-300"
+                    >
+                      {scheme?.title}
+                    </span>
+                  );
+                })}
               </div>
             </section>
 
-            
-
             <button
-              onClick={goToHome}
+              type="button"
+              onClick={() => navigate("/profile")}
               className="flex w-full items-center justify-center gap-2 rounded-3xl bg-emerald-500 px-6 py-4 text-lg font-extrabold text-white shadow-[0_10px_30px_rgba(16,185,129,0.28)] transition hover:brightness-110 active:scale-[0.98]"
             >
-              <span>Set My Profile</span>
-              <ArrowRight className="h-5 w-5" />
+              <span>Done</span>
+              <Check className="h-5 w-5" />
             </button>
           </aside>
         </main>
@@ -845,19 +716,20 @@ export default function SmartRumahCombinedPage() {
   );
 }
 
-function Field({
-  label,
-  icon,
-  children,
-}: {
-  label: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-}) {
+function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="mb-5">
+      <h2 className="text-2xl font-extrabold tracking-tight">{title}</h2>
+      <p className="mt-1 text-sm text-slate-400">{subtitle}</p>
+    </div>
+  );
+}
+
+function Field({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
     <div>
       <label className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-        <span className="text-emerald-500">{icon}</span>
+        <span className="text-emerald-400">{icon}</span>
         {label}
       </label>
       {children}
@@ -865,17 +737,9 @@ function Field({
   );
 }
 
-function Badge({ text }: { text: string }) {
-  return (
-    <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-emerald-300">
-      {text}
-    </span>
-  );
-}
-
 function MiniStat({ label, value, suffix }: { label: string; value: string; suffix?: string }) {
   return (
-    <div className="rounded-3xl border border-white/5 bg-slate-900/40 p-4">
+    <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-4">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
       <p className="mt-2 text-xl font-extrabold text-emerald-400">
         {value} {suffix ? <span className="text-sm text-slate-500">{suffix}</span> : null}
@@ -907,14 +771,4 @@ function toggleCardClass(active: boolean) {
       ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
       : "border-slate-700 bg-slate-900/40 text-slate-400 hover:border-emerald-500/30 hover:text-white"
   }`;
-}
-
-function BuildingIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-7 w-7" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 21V7a2 2 0 0 1 2-2h5v16" />
-      <path d="M11 21V3h7a2 2 0 0 1 2 2v16" />
-      <path d="M7 9h1M7 12h1M7 15h1M14 7h1M14 10h1M14 13h1M14 16h1" />
-    </svg>
-  );
 }
