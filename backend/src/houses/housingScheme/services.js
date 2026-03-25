@@ -1,6 +1,6 @@
 //src/houses/housingScheme/services.js
 const schemes = require("./data");
-const housingProjects = require("./housingScheme.json").housingProjects;
+const housingProjects = require("./housingScheme.json");
 
 function getEligibleSchemes(user) {
 
@@ -24,7 +24,7 @@ function getEligibleSchemes(user) {
       scheme => scheme.name === project.scheme
     );
 
-    const locationMatch = project.state === user.location;
+    const locationMatch = project.State === user.location;
 
     return schemeMatch && locationMatch;
 

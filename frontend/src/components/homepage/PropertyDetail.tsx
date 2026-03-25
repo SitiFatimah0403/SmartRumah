@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function PropertyDetail() {
@@ -29,6 +29,8 @@ export default function PropertyDetail() {
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDfloFoDAthw9axGztjPWhr97mHCQR_II_EawZzZqMkoPM_8Y69yKRhKUZCimPrbju8BxsdR9OLde7BCHI0DzoeeKpfAV4okkoXfF-drtGSw-GAX-_Wy18g7x8dnHfXXvOFXXE3A8-7pRM6iim62xJ2eH5FlMBSCGitRdfZT7A3Hnhr7RTqnWhvPgffgsstZdGuJwp0P3Qu8x3FVxMuGQ6dbVWWdlsDkA3Duy8pmO0iGJeGeT10G6Hm5JQbCkF7OqExKTx70gndRG0",
   };
+
+  
 
   return (
     <div className="dark">

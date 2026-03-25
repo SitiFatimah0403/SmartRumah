@@ -43,8 +43,7 @@ function getPropertyLocation(req, res) {
     res.json(location);
 
   } catch (error) {
-
-    console.error("Map location error:", error);
+    console.error("FULL ERROR:", error);
 
     res.status(500).json({
       error: "Failed to load location"
