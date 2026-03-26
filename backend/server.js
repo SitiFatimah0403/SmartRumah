@@ -5,12 +5,14 @@ const app = express()
 
 const authRoutes=require("./src/auth/routes")
 const housingSchemeRoutes = require("./src/houses/housingScheme/routes");
+const userRoutes = require("./src/user/user.routes")
 
 app.use(cors())
 app.use(express.json())
 
 app.use("/auth", authRoutes)
 app.use("/housing-schemes", housingSchemeRoutes);
+app.use("/users", userRoutes);
 
 app.get("/", (req,res)=>{
     res.send("SmartRumah backend running")
