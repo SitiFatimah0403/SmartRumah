@@ -1,20 +1,44 @@
-import { saveUserProfile } from "../user/profileService.js";
+const { saveUserProfile } = require("../user/profileService");
 
-export const registerUser = async (req, res) => {
+const { auth } = require("./firebase");   //ni dah betul, pasni check from here
+
+const registerUser = async (req, res) => {
   try {
-    const formData = req.body;
 
-    //User ID from the authenticated token
-    const userId = req.user.uid
+    console.log("AUTH:", auth);
+    console.log("REGISTER CONTROLLER RUNNING");
 
-    await saveUserProfile(userId, formData);
+    const { email, password, fullName } = req.body;
 
-    res.status(200).json({
-      message: "User profile saved successfully",
+    if (!email || !password) {
+      return res.status(400).json({
+        error: "Email & password required",
+      });
+    }
+
+    //create user in Firebase Auth
+    const userRecord = await auth.createUser({
+      email,
+      password,
+      displayName: fullName || "",
     });
+
+    //generate custom token
+    const token = await auth.createCustomToken(userRecord.uid);
+
+    res.status(201).json({
+      message: "User registered successfully",
+      uid: userRecord.uid,
+      token: token,
+    });
+
   } catch (error) {
+    console.error("REGISTER ERROR:", error);
+
     res.status(500).json({
-      error: "Failed to save user profile",
+      error: error.message,
     });
   }
 };
+
+module.exports = { registerUser };

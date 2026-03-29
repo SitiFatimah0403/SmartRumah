@@ -1,9 +1,8 @@
-import { db } from "../auth/firebase.js";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+const { db } = require("../auth/firebase");
 
-export const saveUserProfile = async (userId, formData) => {
+const saveUserProfile = async (userId, formData) => {
   try {
-    await setDoc(doc(db, "users", userId), {
+    await db.collection("users").doc(userId).set({
       personalInfo: {
         fullName: formData.fullName,
         nric: formData.nric,
@@ -49,7 +48,7 @@ export const saveUserProfile = async (userId, formData) => {
         selectedSchemes: formData.selectedSchemes,
       },
 
-      createdAt: serverTimestamp(),
+      createdAt: new Date(), // 👈 replace serverTimestamp
     });
 
     return { success: true };
@@ -58,3 +57,5 @@ export const saveUserProfile = async (userId, formData) => {
     throw error;
   }
 };
+
+module.exports = { saveUserProfile };

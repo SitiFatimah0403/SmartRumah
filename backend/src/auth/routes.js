@@ -1,15 +1,17 @@
 const authMiddleware = require("./middleware")
-
+const { registerUser } = require("./controller")
 const router=require("express").Router()
 
 router.get("/me", authMiddleware, (req, res)=> {
 
-  req.json(
+  res.json(
     {
       message: "User authenticated",
       user: req.user
     }
   )
 })
+
+router.post("/register", registerUser);
 
 module.exports=router
