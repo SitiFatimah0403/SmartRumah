@@ -11,6 +11,7 @@ export default function ProfilePage() {
     {
       id: 1,
       title: "Personal Information",
+      section: "personal-information",
       description: "Update your basic details such as name, age, citizenship, and marital status.",
       icon: "person",
       bgColor: "bg-primary/10",
@@ -19,6 +20,7 @@ export default function ProfilePage() {
     {
       id: 2,
       title: "Employment Details",
+      section: "employment-details",
       description: "Update your employment status, job sector, years of employment, and workplace location.",
       icon: "work",
       bgColor: "bg-primary/10",
@@ -27,6 +29,7 @@ export default function ProfilePage() {
     {
       id: 3,
       title: "Housing Preferences",
+      section: "property-preferences",
       description: "Update your preferred state, budget range, commute distance, and priorities.",
       icon: "home",
       bgColor: "bg-primary/10",
@@ -35,6 +38,7 @@ export default function ProfilePage() {
     {
       id: 4,
       title: "Housing Scheme Eligibility",
+      section: "scheme-eligibility",
       description: "Update financial information such as income, dependents, and property ownership.",
       icon: "description",
       bgColor: "bg-primary/10",
@@ -43,6 +47,7 @@ export default function ProfilePage() {
     {
       id: 5,
       title: "Housing Scheme Interest",
+      section: "scheme-interest",
       description: "Select which government housing schemes you want SmartRumah to evaluate.",
       icon: "checklist",
       bgColor: "bg-primary/10",
@@ -138,7 +143,7 @@ export default function ProfilePage() {
               {profileSetupItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => navigate("/profile/edit")}
+                  onClick={() => navigate(`/profile/edit/${item.section}`)}
                   className="w-full flex items-center gap-4 p-4 bg-card-dark rounded-2xl shadow-lg hover:bg-slate-700 transition-colors text-left border border-slate-800 hover:border-primary/30"
                 >
                   <div className={`flex-shrink-0 w-12 h-12 rounded-xl ${item.bgColor} flex items-center justify-center ${item.iconColor}`}>

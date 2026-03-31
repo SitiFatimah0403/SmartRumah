@@ -90,8 +90,23 @@ const schemeOptions: {
   { key: "spb", title: "SPB", subtitle: "Youth Housing Scheme" },
 ];
 
-export default function ProfileEdit() {
+type ProfileEditSection =
+  | "personal-information"
+  | "employment-details"
+  | "property-preferences"
+  | "scheme-eligibility"
+  | "scheme-interest"
+  | "all";
+
+type ProfileEditProps = {
+  activeSection?: ProfileEditSection;
+};
+
+export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps) {
   const navigate = useNavigate();
+
+  const isSectionVisible = (section: ProfileEditSection) => activeSection === "all" || activeSection === section;
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -193,8 +208,9 @@ export default function ProfileEdit() {
 
         <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-6 md:px-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-6">
-            <section className={sectionClass}>
-              <SectionHeader title="Personal Information" subtitle="Basic identity and account details." />
+            {isSectionVisible("personal-information") && (
+              <section className={sectionClass}>
+                <SectionHeader title="Personal Information" subtitle="Basic identity and account details." />
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Field label="Full Name" icon={<User className="h-4 w-4" />}>
@@ -311,9 +327,11 @@ export default function ProfileEdit() {
                 </div>
               )}
             </section>
+            )}
 
-            <section className={sectionClass}>
-              <SectionHeader title="Employment Details" subtitle="Your current work and location profile." />
+            {isSectionVisible("employment-details") && (
+              <section className={sectionClass}>
+                <SectionHeader title="Employment Details" subtitle="Your current work and location profile." />
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Field label="Employment Status" icon={<Briefcase className="h-4 w-4" />}>
@@ -388,49 +406,48 @@ export default function ProfileEdit() {
                 </div>
               </div>
             </section>
+            )}
 
-            <section className={sectionClass}>
+            {isSectionVisible("property-preferences") && (
+              <section className={sectionClass}>
               <SectionHeader title="Property Preferences" subtitle="Refine budget, commute, and property priorities." />
+              <Field label="Preferred State" icon={<MapPin className="h-4 w-4" />}>
+                <div className="relative">
+                  <select
+                    className={`${inputClass} appearance-none pr-10`}
+                    value={formData.preferredState}
+                    onChange={(e) => handleChange("preferredState", e.target.value)}
+                  >
+                    {states.map((state) => (
+                      <option key={state}>{state}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                </div>
+              </Field>
 
-              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-                <Field label="Preferred State" icon={<MapPin className="h-4 w-4" />}>
-                  <div className="relative">
-                    <select
-                      className={`${inputClass} appearance-none pr-10`}
-                      value={formData.preferredState}
-                      onChange={(e) => handleChange("preferredState", e.target.value)}
-                    >
-                      {states.map((state) => (
-                        <option key={state}>{state}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                    <Wallet className="h-4 w-4 text-emerald-400" />
+                    Max Budget
                   </div>
-                </Field>
-
-                <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-4">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
-                      <Wallet className="h-4 w-4 text-emerald-400" />
-                      Max Budget
-                    </div>
-                    <span className="text-xl font-extrabold text-emerald-400">
-                      RM {formData.maxBudget.toLocaleString()}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={100000}
-                    max={1000000}
-                    step={10000}
-                    value={formData.maxBudget}
-                    onChange={(e) => handleChange("maxBudget", Number(e.target.value))}
-                    className="w-full accent-emerald-500"
-                  />
-                  <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
-                    <span>RM 100k</span>
-                    <span>RM 1.0M</span>
-                  </div>
+                  <span className="text-xl font-extrabold text-emerald-400">
+                    RM {formData.maxBudget.toLocaleString()}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={100000}
+                  max={1000000}
+                  step={10000}
+                  value={formData.maxBudget}
+                  onChange={(e) => handleChange("maxBudget", Number(e.target.value))}
+                  className="w-full accent-emerald-500"
+                />
+                <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                  <span>RM 100k</span>
+                  <span>RM 1.0M</span>
                 </div>
               </div>
 
@@ -474,8 +491,10 @@ export default function ProfileEdit() {
                 <MiniStat label="Downpayment" value={formData.downpayment} />
               </div>
             </section>
+            )}
 
-            <section className={sectionClass}>
+            {isSectionVisible("scheme-eligibility") && (
+              <section className={sectionClass}>
               <SectionHeader title="Housing Scheme Eligibility" subtitle="Update household and financing details." />
 
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -613,9 +632,11 @@ export default function ProfileEdit() {
                 </div>
               </div>
             </section>
+            )}
 
-            <section className={sectionClass}>
-              <SectionHeader title="Housing Scheme Interest" subtitle="Choose which schemes to keep on your profile." />
+            {isSectionVisible("scheme-interest") && (
+              <section className={sectionClass}>
+                <SectionHeader title="Housing Scheme Interest" subtitle="Choose which schemes to keep on your profile." />
 
               <div className="mb-5 flex items-center justify-between rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-4">
                 <div>
@@ -668,6 +689,7 @@ export default function ProfileEdit() {
                 </p>
               </div>
             </section>
+            )}
           </div>
 
           <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
