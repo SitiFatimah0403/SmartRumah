@@ -12,42 +12,61 @@ export default function SearchPage() {
     "Bangsar South Bungalow",
   ]);
   const [savedItems, setSavedItems] = useState<number[]>([]);
+  const [sortType, setSortType] = useState<"none" | "low" | "high">("none");;
 
   const categories = [
     { id: "all", label: "All Homes", icon: "grid_view" },
     { id: "apartment", label: "Apartment", icon: "apartment" },
-    { id: "condo", label: "Condo", icon: "home_work" },
-    { id: "landed", label: "Landed", icon: "villa" },
-    { id: "house", label: "House", icon: "home" },
+    { id: "condominium", label: "Condo", icon: "home_work" },
+    { id: "Semi D", label: "Semi D", icon: "villa" },
+    { id: "other", label: "Other", icon: "home" },
   ];
   const [properties, setProperties] = useState<any[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
+
+  const toggleSort = () => {
+    const newType = sortType === "low" ? "high" : "low";
+
+    setSortType(newType);
+
+    const sorted = [...filteredProperties].sort((a, b) => {
+      const priceA = parseFloat(a.Median_Price.replace(/,/g, ""));
+      const priceB = parseFloat(b.Median_Price.replace(/,/g, ""));
+
+      return newType === "low"
+        ? priceA - priceB
+        : priceB - priceA;
+    });
+
+    setFilteredProperties(sorted);
+  };
+
   const featuredAreas = [
     {
       id: 1,
       name: "Kuala Lumpur",
-      count: "1,240 properties",
+      count: "20 properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuCd9ziQmieN5_83eNOvudtUU7Yt6zW7KEvVWu3Dd1jRrk7miaXWyPByo63e_-XdXyMT-NVMhIJNcKBQjQhrrdYMKfIi0vqMKYyywM9vtO-tV09HlFHyByUequ2MmB10xEp5D_nfE1O8HcxWZtzVih9IlFQUgD-elt2BtAhMOZZZqVEvD_PjUwi9yUevPfMozewum1mO2OW95PbJ0uXQshFERsBVsaaugEymBtk9xqaYRp2OtRj8ndZvUXyGcEyWDKcXl9rTF-2an1U",
     },
     {
       id: 2,
-      name: "Cyberjaya",
-      count: "840 properties",
+      name: "Putrajaya",
+      count: "20 properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDGrmunf4UQFNQDSH_58qtOjduBzpBgrtlPj5gYX9FEwbX531QFvHoC-nTVABfoLaG_P4Avgwk8DugRDdcFETLrrDhZdrhJ7mAP0UQxLBDORQw_VmHxQozy5qhYtVNK28xOK6ccizF3UVMvAKGOKxkZmKFozEz-s6IiPnFYbUbPDiCN3VQ3vMl-ixZRbsnpf2a7yawKBRzsxHN2zPgFUYtaO689W7LlJJRUFSJyatDoWtczjLCGOi0ilVXxV3Twd5R0qGEpHS1mKyg",
     },
     {
       id: 3,
-      name: "Mont Kiara",
-      count: "520 properties",
+      name: "Selangor",
+      count: "20 properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuCzuSa_9boX2apdjiYOjwVcIBQNMJRV57e7KB_a8UdYFFGHSMTfNV5CbFzzZITDLUxy6zcWfvfwWjaPRjCysgglaQTMct3uBsCEF08zW_rHsOuP_tIjzvGM7tUDJHefdjNYXn5jE85wcpwsYpSV8x4E7KYelHZjbeQcQBaFhhDR3su_CECoFjAmEuf_4Za5MFyu773-zDIzf3IhIF81TEHa-aFIRVvt3iQQS5kclp325VCejFYVguP0TZDhUtdaqw2P-9I7CmJp41o",
     },
     {
       id: 4,
-      name: "Petaling Jaya",
-      count: "980 properties",
+      name: "Coming Soon",
+      count: "- properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuA2IkP9ylsmEZsnGiMLezfMh4lWLE0PnRjVxeYXxziWb_u7Ag2tH4qrxwfGGHtL-plpzlv03GwFkpigCWb2nQx8Zar_bztiBaeTQCZcIpuL6CpNLUW-x7KkDGlrtla8XoornOoulXBaI1YB-IvDH7qwIx_AqJWIWS7g060DFWNonWxVwZ925-PQnYrOEOih173_psgaoMpLFqR56BI3Xf5-xWZuaWxr--5n86Y5KHbqgHvtvy5Gr9JfOPMYwcL8g5k7MVnCgiGycS8",
     },
@@ -118,6 +137,53 @@ export default function SearchPage() {
     );
   };
 
+  const handleAreaClick = (areaName: string) => {
+    setSearchQuery(areaName);     // fill search box
+    setHasSearched(true);         // switch to result view
+
+    const query = areaName.toLowerCase();
+
+    const filtered = properties.filter((p) => {
+      return (
+        p.Township?.toLowerCase().includes(query) ||
+        p.State?.toLowerCase().includes(query)
+      );
+    });
+
+    setFilteredProperties(filtered);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    setHasSearched(true);
+
+    const query = searchQuery.trim().toLowerCase();
+
+    const mainTypes = [
+      "apartment",
+      "condominium",
+      "semi d"
+    ];
+
+    const filtered = properties.filter((p) => {
+      const matchSearch =
+        p.Township?.toLowerCase().includes(query) ||
+        p.State?.toLowerCase().includes(query) ||
+        p.Property_Name?.toLowerCase().includes(query);
+
+      const matchCategory =
+        category === "all"
+          ? true
+          : category === "other"
+            ? !mainTypes.includes(p.Property_Type?.toLowerCase())
+            : p.Property_Type?.toLowerCase().includes(category.toLowerCase());
+
+      return matchSearch && matchCategory;
+    });
+
+    setFilteredProperties(filtered);
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setHasSearched(true);
@@ -125,16 +191,19 @@ export default function SearchPage() {
     const query = searchQuery.trim().toLowerCase();
 
     const filtered = properties.filter((p) => {
-      return (
+      const matchSearch =
         p.Township?.toLowerCase().includes(query) ||
         p.State?.toLowerCase().includes(query) ||
         p.Property_Type?.toLowerCase().includes(query) ||
         p.Property_Name?.toLowerCase().includes(query) ||
-        p.Area?.toLowerCase().includes(query)
-      );
-    });
+        p.Area?.toLowerCase().includes(query);
 
-    console.log("Filtered:", filtered);
+      const matchCategory =
+        selectedCategory === "all" ||
+        p.Property_Type?.toLowerCase() === selectedCategory;
+
+      return matchSearch && matchCategory;
+    });
 
     setFilteredProperties(filtered);
   };
@@ -203,7 +272,7 @@ export default function SearchPage() {
             {categories.map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => handleCategoryClick(cat.id)}
                 className={`flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${selectedCategory === cat.id
                   ? "bg-primary text-white"
                   : "bg-card-dark text-slate-300 border border-slate-800 hover:border-slate-700"
@@ -256,7 +325,11 @@ export default function SearchPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {featuredAreas.map((area) => (
-                    <div key={area.id} className="relative h-40 rounded-2xl overflow-hidden group cursor-pointer">
+                    <div
+                      key={area.id}
+                      onClick={() => handleAreaClick(area.name)}
+                      className="relative h-40 rounded-2xl overflow-hidden group cursor-pointer"
+                    >
                       <img
                         alt={area.name}
                         src={area.image}
@@ -313,10 +386,19 @@ export default function SearchPage() {
             <>
               <div className="flex items-center justify-between">
                 <p className="text-slate-400 text-sm font-medium">
-                  {properties.length} properties found in <span className="text-primary font-bold">{searchQuery}</span>
+                  {filteredProperties.length} properties found in <span className="text-primary font-bold">{searchQuery}</span>
                 </p>
-                <button className="text-primary text-xs font-bold flex items-center gap-1 hover:text-primary/80">
-                  SORT BY <span className="material-symbols-outlined text-xs">sort</span>
+                <button
+                  onClick={toggleSort}
+                  className="text-primary text-xs font-bold flex items-center gap-1 hover:text-primary/80"
+                >
+                  SORT BY PRICE
+
+                  <span className="material-symbols-outlined text-xs">
+                    {sortType === "low" ? "arrow_upward" :
+                      sortType === "high" ? "arrow_downward" :
+                        "sort"}
+                  </span>
                 </button>
               </div>
 
