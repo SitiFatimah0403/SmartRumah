@@ -29,7 +29,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"PR1MA"
+    "Housing_Scheme":"PR1MA",
+    "propertyImage": "https://lh3.googleusercontent.com/d/16DFxPMMjSbT5S7l1hvJd5qQ2Ez6rB0Pl"
   },
   {
     "Property_ID":"HS02",
@@ -61,7 +62,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1L8A7l8yEXmeVbKddB9V4v9hW9H3XyL-C"
   },
   {
     "Property_ID":"HS03",
@@ -93,7 +95,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1OSB75y1SRfF3YhuANlbnIMGlOQeodiPR"
   },
   {
     "Property_ID":"HS04",
@@ -125,7 +128,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1BZdKWTa_zDFsy-9tiqRcPAnX1nF7AkPU"
   },
   {
     "Property_ID":"HS05",
@@ -157,7 +161,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1LKK_yNLejejkrHWfHUf5zFSswGGace3m"
   },
   {
     "Property_ID":"HS06",
@@ -189,7 +194,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1DERCV5Z4IideI1Tqx5bcnV8cu5kODJdV"
   },
   {
     "Property_ID":"HS07",
@@ -221,7 +227,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1vyc6zO6ho5FG-8FTlbKG2tNhHcC4aM6I"
   },
   {
     "Property_ID":"HS08",
@@ -253,7 +260,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"PR1MA"
+    "Housing_Scheme":"PR1MA",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1n_nVsgyu4n05Mk_tzDvTG33TVFTjfncP"
   },
   {
     "Property_ID":"HS09",
@@ -285,7 +293,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1LrWvgM7KVLXzjoV_jl5_AkBlphJqCgIu"
   },
   {
     "Property_ID":"HS10",
@@ -317,7 +326,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1cWn19_8W8rYJLexpn9LFjEjS_BAh1XOp"
   },
   {
     "Property_ID":"HS11",
