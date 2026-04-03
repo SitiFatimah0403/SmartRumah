@@ -27,7 +27,9 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1Dmv0Q9CAtQzmHagZeehjASTFQoZolgNh"
+
   },
   {
     "Property_ID": "S02",
@@ -57,7 +59,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1Q16hfBH6gbE0cT8mvwqku4l-YE_v8pNj"
   },
   {
     "Property_ID": "S03",
@@ -87,7 +90,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/19UhHbei-W8kFwsHWT4pi-lRuFjI4-4AU"
   },
   {
     "Property_ID": "S04",
@@ -117,7 +121,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1zgfqHCfW1OXceJR3GxKhY4650NoEZwBf"
   },
   {
     "Property_ID": "S05",
@@ -147,7 +152,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1LL4mibsk-KFzE8PkAFEcx-7vHWF44Ztv"
   },
   {
     "Property_ID": "S06",
@@ -177,7 +183,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1CVPaENgqe-DlhURoN83Yr6lv96iH5zoB"
   },
   {
     "Property_ID": "S07",
@@ -207,7 +214,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1YAE62GeiFvp9dxeThSwEimAAw0UtjB0O"
   },
   {
     "Property_ID": "S08",
@@ -237,7 +245,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1W50AVqnLO9NWqmCNORjyRvZNaXqXqJlt"
   },
   {
     "Property_ID": "S09",
@@ -267,7 +276,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1cbJn2sVGY9P3RfFELNO_5UHt5F2fMLNd"
   },
   {
     "Property_ID": "S10",
@@ -297,7 +307,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1fYEsiBJ3yxr4hX4jLcdrACndN1zdmIkY"
   },
   {
     "Property_ID": "S11",
@@ -327,7 +338,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1gfqZmQCW_TPU7qESdY0OR6NFFu1I-hVB"
   },
   {
     "Property_ID": "S12",
@@ -357,7 +369,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1zBFQhJRMHi8pW8o5-roh21RYZ2lFmt8S"
   },
   {
     "Property_ID": "S13",
@@ -387,7 +400,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1XkIybOLYUf1WcmuzkK-jdvUAWYcg6dun"
   },
   {
     "Property_ID": "S14",
@@ -417,7 +431,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1_EwiFB-m_629ox6YLj-35JxId6t9ej_o"
   },
   {
     "Property_ID": "S15",
@@ -447,7 +462,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1euApRBKqHp4IjQ8FGE2QZTW8afsQQrzm"
   },
   {
     "Property_ID": "S16",
@@ -477,7 +493,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1EFi0LQjvn4Zdaw1D3zFVdHMqi7wdS76d"
   },
   {
     "Property_ID": "S17",
@@ -507,7 +524,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/15fU-DJtMmQ2EBnR3EKsS3UKLpmWlgun5"
   },
   {
     "Property_ID": "S18",
@@ -537,7 +555,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1jga9VpVqA34sR9w2IvOUmb523GP3Y14k"
   },
   {
     "Property_ID": "S19",
@@ -567,7 +586,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1hF3tiN259XU-F5p7eg1Gp1EJffSS5Xqe"
   },
   {
     "Property_ID": "S20",
@@ -597,6 +617,7 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/15hReObLhBcg3HdeHu_VLesJO3b-AC8rC"
   }
 ]
