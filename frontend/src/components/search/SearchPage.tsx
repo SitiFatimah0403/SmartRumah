@@ -29,15 +29,7 @@ export default function SearchPage() {
 
     setSortType(newType);
 
-    const sorted = [...filteredProperties].sort((a, b) => {
-      const priceA = parseFloat(a.Median_Price.replace(/,/g, ""));
-      const priceB = parseFloat(b.Median_Price.replace(/,/g, ""));
-
-      return newType === "low"
-        ? priceA - priceB
-        : priceB - priceA;
-    });
-
+    const sorted = sortProperties(filteredProperties, newType);
     setFilteredProperties(sorted);
   };
 
@@ -71,54 +63,6 @@ export default function SearchPage() {
         "https://lh3.googleusercontent.com/aida-public/AB6AXuA2IkP9ylsmEZsnGiMLezfMh4lWLE0PnRjVxeYXxziWb_u7Ag2tH4qrxwfGGHtL-plpzlv03GwFkpigCWb2nQx8Zar_bztiBaeTQCZcIpuL6CpNLUW-x7KkDGlrtla8XoornOoulXBaI1YB-IvDH7qwIx_AqJWIWS7g060DFWNonWxVwZ925-PQnYrOEOih173_psgaoMpLFqR56BI3Xf5-xWZuaWxr--5n86Y5KHbqgHvtvy5Gr9JfOPMYwcL8g5k7MVnCgiGycS8",
     },
   ];
-
-  // const properties = [
-  //   {
-  //     id: 1,
-  //     name: "Mont Kiara Luxury Condo",
-  //     price: "RM 1,250,000",
-  //     location: "Jalan Kiara, Mont Kiara, Kuala Lumpur",
-  //     beds: 3,
-  //     baths: 2,
-  //     sqft: "1,250",
-  //     matchScore: "92%",
-  //     flood: "Low",
-  //     landslide: "Low",
-  //     safety: "92",
-  //     image:
-  //       "https://lh3.googleusercontent.com/aida-public/AB6AXuDRB7qkqMrKtb9oWciW2SWyKarMPuocuVvv9QZxN-HPbdlIAtj2txCZ2aWDmZtwpKvHxcP8RY_0IhZg-jb-iX-bkZrwd1A47FH9BYyp-NsWPdVkGyDlqVkHsa-VnBH9RwNZ3OxXN0B1AfsqODbWxWTj0A4VK5j38uH21gyc3O55Bx9UuZdu4wZ1REr9WM6WrWoLIFhEfbM0QrsBsTwHYJk98gk2U7WuaNg1fHApl5emjYa4UfpxMdcASENCnNcxiHBeN9YPYia8hRc",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Kiara 163 Serviced Suites",
-  //     price: "RM 980,000",
-  //     location: "Mont Kiara, KL",
-  //     beds: 2,
-  //     baths: 2,
-  //     sqft: "850",
-  //     matchScore: "92%",
-  //     flood: "Low",
-  //     landslide: "Low",
-  //     safety: "98",
-  //     image:
-  //       "https://lh3.googleusercontent.com/aida-public/AB6AXuBQR1vPFx1WRAAhvfCMeP3beUFmpf_lGRqbB108FUgzbBhh2vG49updp2exNLw24J-qId6R32NXkL2mWkTxNyFl5Gfpxpw2FWFzNpmSS-iQBRSf7BmYEQX8qJM9zMIv0a3MZZWi1R6qyMtG7TLAzJkyU7E24F4crkEW2t7USiV3EQ1noO5grUCaEIBKQOs6x9QidRd5Xf_NTbA-ZrC7M0_lObDGAZHsx1oXgXAKUUzqaRpfYZyJLfpnR7ZTtAIEsUF9TY2uNJIbZIQ",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Residensi 22 Penthouse",
-  //     price: "RM 2,450,000",
-  //     location: "North Kiara, Mont Kiara",
-  //     beds: 4,
-  //     baths: 4,
-  //     sqft: "2,900",
-  //     matchScore: "92%",
-  //     flood: "Low",
-  //     landslide: "Low",
-  //     safety: "95",
-  //     image:
-  //       "https://lh3.googleusercontent.com/aida-public/AB6AXuBCN_fcSQswehc1d8d4n04pKtfdUMYDMv4eqWY_LyIV-LP2IiD3Oatu86Zd-iqJpoZD9uXgcY1os7atglVD3Qr56Ne3ZqQuxqaP3hJLJRzDfmpmWCteBVnHzkYk6bW1e4yq89LdShz5MuTPpvT7Aykg0UEEpTyM_K2xnTfC4NgCht5-ZPACVKbUeB7nAdu-qAOaPV5XY1FT7ep_R-y5bVR6-8KgKGLlfmO6dLiDmB-CdDi0EQL-iuvua7aLZq4DNwokRR3KsrHKmsw",
-  //   },
-  // ];
 
   const recommendedProperty = {
     name: "The Elements Sky Suite",
@@ -183,6 +127,13 @@ export default function SearchPage() {
 
     setFilteredProperties(filtered);
   };
+  const sortProperties = (data: any[], type: string) => {
+    return [...data].sort((a, b) => {
+      if (type === "low") return a.Median_Price - b.Median_Price;
+      if (type === "high") return b.Median_Price - a.Median_Price;
+      return 0;
+    });
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -190,7 +141,7 @@ export default function SearchPage() {
 
     const query = searchQuery.trim().toLowerCase();
 
-    const filtered = properties.filter((p) => {
+    let filtered = properties.filter((p) => {
       const matchSearch =
         p.Township?.toLowerCase().includes(query) ||
         p.State?.toLowerCase().includes(query) ||
@@ -204,6 +155,11 @@ export default function SearchPage() {
 
       return matchSearch && matchCategory;
     });
+
+    // ✅ APPLY SORT AFTER FILTER
+    if (sortType !== "none") {
+      filtered = sortProperties(filtered, sortType);
+    }
 
     setFilteredProperties(filtered);
   };
@@ -433,7 +389,7 @@ export default function SearchPage() {
                           </span>
                         </div>
                         <div className="absolute bottom-3 left-3 bg-slate-900/60 backdrop-blur px-3 py-1 rounded-lg text-white text-sm font-bold">
-                          RM {property.Median_Price}
+                          RM {property.Median_Price.toLocaleString()}
                         </div>
                       </div>
                       <div className="p-4">
