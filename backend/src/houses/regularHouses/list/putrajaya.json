@@ -12,7 +12,7 @@
     "Toilet": "2",
     "Carpark": "2",
     "Floor_Level": "Ground Floor",
-    "Median_Price": "500000",
+    "Median_Price": "500,000",
     "Median_PSF": "268.67",
     "Lat": "2.95348257588696",
     "Lng": "101.67422010259",
@@ -27,7 +27,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/13wgDqGgcIz2zyfKjCtrLHjAx974XYZF9"
   },
   {
     "Property_ID": "P02",
@@ -42,7 +43,7 @@
     "Toilet": "2",
     "Carpark": "2",
     "Floor_Level": "4",
-    "Median_Price": "400000",
+    "Median_Price": "400,000",
     "Median_PSF": "400",
     "Lat": "2.9536540092289",
     "Lng": "101.676966684534",
@@ -57,7 +58,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1h1S_KSJ-8vmhr26Ad0WCyD53etDXJCrJ"
   },
   {
     "Property_ID": "P03",
@@ -72,7 +74,7 @@
     "Toilet": "2",
     "Carpark": "1",
     "Floor_Level": "Mid Floor",
-    "Median_Price": "395000",
+    "Median_Price": "395,000",
     "Median_PSF": "451.43",
     "Lat": "2.9560540732364",
     "Lng": "101.673705118475",
@@ -87,7 +89,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1noootqcyyVeuMmMwkCLFgE5voc0J9rV6"
   },
   {
     "Property_ID": "P04",
@@ -102,7 +105,7 @@
     "Toilet": "3",
     "Carpark": "2",
     "Floor_Level": "Low Floor ",
-    "Median_Price": "450000",
+    "Median_Price": "450,000",
     "Median_PSF": "321.43",
     "Lat": "2.94436703726621",
     "Lng": "101.720512765226",
@@ -117,7 +120,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1AE5HZyHKw8DTCAJ_OjO-npmwis21Ex3r"
   },
   {
     "Property_ID": "P05",
@@ -132,7 +136,7 @@
     "Toilet": "2",
     "Carpark": "2",
     "Floor_Level": "Low Floor ",
-    "Median_Price": "515000",
+    "Median_Price": "515,000",
     "Median_PSF": "429.17",
     "Lat": "2.926941778884",
     "Lng": "101.680354918125",
@@ -147,7 +151,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1deVU5CpyQzGqueg3xuTZjRgFjwxQoXsv"
   },
   {
     "Property_ID": "P06",
@@ -162,7 +167,7 @@
     "Toilet": "7",
     "Carpark": "Covered Car Park",
     "Floor_Level": "2",
-    "Median_Price": "2100000",
+    "Median_Price": "2,100,000",
     "Median_PSF": "625",
     "Lat": "2.93353485096052",
     "Lng": "101.684749650716",
@@ -177,7 +182,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1laURMeRZfFavJ0CAhjk84gone6zLI7-0"
   },
   {
     "Property_ID": "P07",
@@ -192,7 +198,7 @@
     "Toilet": "7",
     "Carpark": "3",
     "Floor_Level": "3",
-    "Median_Price": "1590000",
+    "Median_Price": "1,590,000",
     "Median_PSF": "497.34",
     "Lat": "2.95666733738924",
     "Lng": "101.701743116187",
@@ -207,7 +213,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/165j0ULWJTSyuCTO7Cb7_hRwwdMomP0qU"
   },
   {
     "Property_ID": "P08",
@@ -222,7 +229,7 @@
     "Toilet": "6",
     "Carpark": "Covered Car Park",
     "Floor_Level": "2.5",
-    "Median_Price": "3000000",
+    "Median_Price": "3,000,000",
     "Median_PSF": "836.35",
     "Lat": "2.93439798741339",
     "Lng": "101.708089271411",
@@ -237,7 +244,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "No"
+    "Playground": "No",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1IerVMhOi9UShb5JosXbQkeZVB6wGgeYx"
   },
   {
     "Property_ID": "P09",
@@ -252,7 +260,7 @@
     "Toilet": "6",
     "Carpark": "Covered Car Park",
     "Floor_Level": "2.5",
-    "Median_Price": "1500000",
+    "Median_Price": "1,500,000",
     "Median_PSF": "668.75",
     "Lat": "2.94419252025219",
     "Lng": "101.715069168555",
@@ -267,7 +275,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1qkfZvQBkcORTCLV6ePgS-jlHNIg4PqYu"
   },
   {
     "Property_ID": "P10",
@@ -282,7 +291,7 @@
     "Toilet": "6",
     "Carpark": "4",
     "Floor_Level": "3",
-    "Median_Price": "2990000",
+    "Median_Price": "2,990,000",
     "Median_PSF": "707.52",
     "Lat": "2.9305013092674",
     "Lng": "101.68350911311",
@@ -297,7 +306,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "Yes",
     "Gym": "No",
-    "Playground": "No"
+    "Playground": "No",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1jN6KnWXVMLksRMRqgOtOCYEok4aP4Eqv"
   },
   {
     "Property_ID": "P11",
@@ -312,7 +322,7 @@
     "Toilet": "5",
     "Carpark": "3",
     "Floor_Level": "2.5",
-    "Median_Price": "2990000",
+    "Median_Price": "2,990,000",
     "Median_PSF": "622.92",
     "Lat": "2.93777647249637",
     "Lng": "101.686437093737",
@@ -327,7 +337,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "No"
+    "Playground": "No",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1Uf8ajNn-N4A3dtO-emKRiEgdcLcooq5N"
   },
   {
     "Property_ID": "P12",
@@ -342,7 +353,7 @@
     "Toilet": "2",
     "Carpark": "2",
     "Floor_Level": "14",
-    "Median_Price": "460000",
+    "Median_Price": "460,000",
     "Median_PSF": "614.97",
     "Lat": "2.93581494024546",
     "Lng": "101.681829202547",
@@ -357,7 +368,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1bth7ljaV7V1gCaAcvVyocLPwhpYx5_V2"
   },
   {
     "Property_ID": "P13",
@@ -372,7 +384,7 @@
     "Toilet": "2",
     "Carpark": "2",
     "Floor_Level": "High Floor",
-    "Median_Price": "330000",
+    "Median_Price": "330,000",
     "Median_PSF": "440",
     "Lat": "2.93876103736245",
     "Lng": "101.713304109789",
@@ -387,7 +399,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1H6eX3xyPSkTWODPYejXletfvgegroujl"
   },
   {
     "Property_ID": "P14",
@@ -402,7 +415,7 @@
     "Toilet": "3",
     "Carpark": "Covered Car Park",
     "Floor_Level": "2",
-    "Median_Price": "870000",
+    "Median_Price": "870,000",
     "Median_PSF": "414.29",
     "Lat": "2.96247780587388",
     "Lng": "101.669285235177",
@@ -417,7 +430,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "No"
+    "Playground": "No",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1u3TQBviMj7FAvhDbHuojZaB81HT-NfoV"
   },
   {
     "Property_ID": "P15",
@@ -432,7 +446,7 @@
     "Toilet": "7",
     "Carpark": "Covered Car Park",
     "Floor_Level": "3",
-    "Median_Price": "3500000",
+    "Median_Price": "3,500,000",
     "Median_PSF": "665.4",
     "Lat": "2.92696285510528",
     "Lng": "101.682248851354",
@@ -447,7 +461,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "Yes",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1Nm-ztDBmJuElAEh7WIhLZgaANUOiWEcu"
   },
   {
     "Property_ID": "P16",
@@ -462,7 +477,7 @@
     "Toilet": "3",
     "Carpark": "2",
     "Floor_Level": "High Floor",
-    "Median_Price": "956000",
+    "Median_Price": "956,000",
     "Median_PSF": "807.43",
     "Lat": "2.92169438498856",
     "Lng": "101.678805536432",
@@ -477,7 +492,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1DyS4EULxy3h2ioQ8IY7vwi1SW1LyYOf5"
   },
   {
     "Property_ID": "P17",
@@ -492,7 +508,7 @@
     "Toilet": "2",
     "Carpark": "2",
     "Floor_Level": "High Floor",
-    "Median_Price": "380000",
+    "Median_Price": "380,000",
     "Median_PSF": "380",
     "Lat": "2.94153668771782",
     "Lng": "101.716401864181",
@@ -507,7 +523,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/12PiYKwqVL_V4KDimu9Nc8rJvSNBzkgH6"
   },
   {
     "Property_ID": "P18",
@@ -522,7 +539,7 @@
     "Toilet": "2",
     "Carpark": "2",
     "Floor_Level": "Mid Floor",
-    "Median_Price": "418000",
+    "Median_Price": "418,000",
     "Median_PSF": "525.13",
     "Lat": "2.89513215654039",
     "Lng": "101.666125095908",
@@ -537,7 +554,8 @@
     "Security_24h": "Yes",
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/1lxuRSJD4M1WupxbdKFftJu6jGXm1Sa7-"
   },
   {
     "Property_ID": "P19",
@@ -552,7 +570,7 @@
     "Toilet": "2",
     "Carpark": "Open Parking",
     "Floor_Level": "1",
-    "Median_Price": "230000",
+    "Median_Price": "230,000",
     "Median_PSF": "328.57",
     "Lat": "2.9620423160365",
     "Lng": "101.663932591711",
@@ -567,7 +585,8 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/16qpuZ8x-y-k__-61iRth2hM3xsg74di-"
   },
   {
     "Property_ID": "P20",
@@ -582,7 +601,7 @@
     "Toilet": "2",
     "Carpark": "Open Parking",
     "Floor_Level": "4",
-    "Median_Price": "260000",
+    "Median_Price": "260,000",
     "Median_PSF": "371.43",
     "Lat": "2.96192057176521",
     "Lng": "101.663888784295",
@@ -597,6 +616,7 @@
     "Security_24h": "No",
     "Swimming_Pool": "No",
     "Gym": "No",
-    "Playground": "Yes"
+    "Playground": "Yes",
+    "propertyImage":"https://lh3.googleusercontent.com/d/19vwO-vzfYy4chxTjssHC84Zi9pwRZdkd"
   }
 ]
