@@ -322,7 +322,7 @@ export default function SearchPage() {
 
               <div className="space-y-6">
                 {filteredProperties.map((property) => {
-                  console.log("Image URL:", property.Image); //utk debug image problem
+                  console.log("Image URL:", property.propertyImage); //utk debug image problem
                   return (
                     <div
                       key={property.Property_ID}
@@ -331,7 +331,7 @@ export default function SearchPage() {
                       <div className="relative h-56 w-full">
                         <img
                           alt={property.Property_Name}
-                          src={property.Image}
+                          src={property.propertyImage}
                           loading="lazy"
                           className="w-full h-full object-cover"
                         />
