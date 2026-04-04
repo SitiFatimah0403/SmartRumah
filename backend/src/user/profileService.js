@@ -17,7 +17,9 @@ const saveUserProfile = async (userId, formData) => {
         employmentStatus: formData.employmentStatus,
         jobSector: formData.jobSector,
         yearsOfEmployment: formData.yearsOfEmployment,
-        workplaceLocation: formData.workplaceLocation,
+        workplaceLocation: formData.workplaceLocation, 
+        workplaceLat: formData.workplaceLat,  
+        workplaceLng: formData.workplaceLng  
       },
 
       propertyPreferences: {
