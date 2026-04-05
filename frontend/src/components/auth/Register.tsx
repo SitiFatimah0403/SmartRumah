@@ -45,7 +45,7 @@ const states = [
   "Labuan",
 ];
 
-type SchemeKey = "prima" | "selangorku" | "myhome" | "rumawip" | "spb";
+type SchemeKey = "prima" | "selangorku" | "rumawip" ;
 
 const schemeOptions: {
   key: SchemeKey;
@@ -55,9 +55,7 @@ const schemeOptions: {
 }[] = [
   { key: "prima", title: "PR1MA", subtitle: "Affordable Urban Living", icon: <BuildingIcon /> },
   { key: "selangorku", title: "Rumah Selangorku", subtitle: "Selangor State Housing", icon: <House className="h-7 w-7" /> },
-  { key: "myhome", title: "MyHome", subtitle: "Private Affordable Housing", icon: <Home className="h-7 w-7" /> },
   { key: "rumawip", title: "RUMAWIP", subtitle: "Federal Territory Residency", icon: <Landmark className="h-7 w-7" /> },
-  { key: "spb", title: "SPB", subtitle: "Youth Housing Scheme", icon: <Briefcase className="h-7 w-7" /> },
 ];
 
 export default function SmartRumahCombinedPage() {
