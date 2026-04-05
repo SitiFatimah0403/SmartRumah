@@ -1,37 +1,69 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function PropertyDetail() {
   const navigate = useNavigate();
+  const { id } = useParams();
+
   const [isSaved, setIsSaved] = useState(false);
+  const [property, setProperty] = useState<any>(null);
+  const [location, setLocation] = useState<any>(null);
 
-  const property = {
-    name: "Residensi Melawati",
-    price: "RM 380,000",
-    beds: 3,
-    baths: 2,
-    sqft: "950",
-    psf: "400",
-    pricePerSqft: "RM 996.73",
-    matchScore: "92%",
-    address: "Jalan Melawati 1, Taman Melawati, 53100 Kuala Lumpur",
-    coordinates: "3.2104° N, 101.7485° E",
-    monthlyCost: "RM 2,697",
-    mortgage: "RM 2,147",
-    commute: "RM 300",
-    maintenance: "RM 250",
-    principal: "RM 712",
-    interest: "RM 1,434",
-    propertyPrice: "RM 512,000",
-    loanAmount: "RM 460,800",
-    interestRate: "3.8%",
-    loanTenure: "30 years",
-    downpayment: "RM 51,200",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDfloFoDAthw9axGztjPWhr97mHCQR_II_EawZzZqMkoPM_8Y69yKRhKUZCimPrbju8BxsdR9OLde7BCHI0DzoeeKpfAV4okkoXfF-drtGSw-GAX-_Wy18g7x8dnHfXXvOFXXE3A8-7pRM6iim62xJ2eH5FlMBSCGitRdfZT7A3Hnhr7RTqnWhvPgffgsstZdGuJwp0P3Qu8x3FVxMuGQ6dbVWWdlsDkA3Duy8pmO0iGJeGeT10G6Hm5JQbCkF7OqExKTx70gndRG0",
-  };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch property details
+        let propertyData = null;
 
-  
+      // Try regular houses
+      const res1 = await fetch(`http://localhost:5000/houses/${id}`);
+      if (res1.ok) {
+        propertyData = await res1.json();
+      }
+
+      // If not found, try housing schemes
+      if (!propertyData) {
+        const res2 = await fetch(`http://localhost:5000/housing-schemes/${id}`);
+        if (res2.ok) {
+          propertyData = await res2.json();
+        }
+      }
+
+      // 🚨 FINAL CHECK
+      if (!propertyData) {
+        console.error("Property not found for ID:", id);
+        return;
+      }
+
+      setProperty(propertyData);
+
+        // Fetch location (lat lng)
+        const locationRes = await fetch(
+          `http://localhost:5000/map/property/${id}`
+        );
+        const locationData = await locationRes.json();
+        setLocation(locationData);
+
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    if (id) fetchData();
+  }, [id]);
+
+  if (!property) {
+    return <div className="text-white p-6">Loading...</div>;
+  }
+  console.log("Property Data:", property);
+
+  // Facilities logic
+  const facilities: string[] = [];
+
+  if (property.Security_24h === "Yes") facilities.push("24h Security");
+  if (property.Swimming_Pool === "Yes") facilities.push("Swimming Pool");
+  if (property.Gym === "Yes") facilities.push("Gym");
+  if (property.Playground === "Yes") facilities.push("Playground");
 
   return (
     <div className="dark">
@@ -49,12 +81,12 @@ export default function PropertyDetail() {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage: `linear-gradient(rgba(10, 15, 26, 0.2), rgba(10, 15, 26, 0.9)), url('${property.image}')`,
+              backgroundImage: `linear-gradient(rgba(10, 15, 26, 0.2), rgba(10, 15, 26, 0.9)), url('${property.propertyImage}')`,
             }}
           />
           <div className="absolute bottom-16 left-0 p-6 w-full flex flex-col gap-1">
-            <h1 className="text-3xl font-extrabold text-white">{property.name}</h1>
-            <p className="text-primary text-2xl font-bold">{property.price}</p>
+            <h1 className="text-3xl font-extrabold text-white">{property.Property_Name}</h1>
+            <p className="text-primary text-2xl font-bold">RM {property.Median_Price?.toLocaleString()}</p>
           </div>
         </section>
 
@@ -65,7 +97,7 @@ export default function PropertyDetail() {
                 <span className="material-symbols-outlined text-primary text-2xl">bed</span>
               </div>
               <div className="text-center">
-                <p className="text-white font-extrabold text-lg leading-none">{property.beds}</p>
+                <p className="text-white font-extrabold text-lg leading-none">{property.Bedroom}</p>
                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Beds</p>
               </div>
             </div>
@@ -74,7 +106,7 @@ export default function PropertyDetail() {
                 <span className="material-symbols-outlined text-primary text-2xl">bathtub</span>
               </div>
               <div className="text-center">
-                <p className="text-white font-extrabold text-lg leading-none">{property.baths}</p>
+                <p className="text-white font-extrabold text-lg leading-none">{property.Toilet}</p>
                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Baths</p>
               </div>
             </div>
@@ -83,7 +115,7 @@ export default function PropertyDetail() {
                 <span className="material-symbols-outlined text-primary text-2xl">square_foot</span>
               </div>
               <div className="text-center">
-                <p className="text-white font-extrabold text-lg leading-none">{property.sqft}</p>
+                <p className="text-white font-extrabold text-lg leading-none">{property.Floor_Area_sqft}</p>
                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">sqft</p>
               </div>
             </div>
@@ -92,7 +124,7 @@ export default function PropertyDetail() {
                 <span className="material-symbols-outlined text-primary text-2xl">grid_view</span>
               </div>
               <div className="text-center">
-                <p className="text-white font-extrabold text-lg leading-none">{property.psf}</p>
+                <p className="text-white font-extrabold text-lg leading-none">{property.Median_PSF}</p>
                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">PSF</p>
               </div>
             </div>
@@ -102,7 +134,7 @@ export default function PropertyDetail() {
         <section className="px-4 relative z-10 mt-4">
           <div className="bg-slate-900/80 border border-primary/30 backdrop-blur-xl rounded-xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.15)] flex items-center gap-4">
             <div className="flex flex-col items-center justify-center bg-primary/20 rounded-lg p-3 min-w-[80px]">
-              <span className="text-3xl font-bold text-primary">{property.matchScore}</span>
+              <span className="text-3xl font-bold text-primary">{property.matchScore || 85}</span>
             </div>
             <div className="flex flex-col">
               <p className="text-white font-bold text-lg">Overall Suitability Score</p>
@@ -118,22 +150,36 @@ export default function PropertyDetail() {
               Location & Accessibility
             </h2>
             <div className="flex flex-col gap-1">
-              <p className="text-white font-semibold text-sm">{property.address}</p>
-              <p className="text-slate-500 text-xs tracking-wide">Coordinates: {property.coordinates}</p>
+              <p className="text-white font-semibold text-sm">{location?.address || `${property.Township}, ${property.Area}, ${property.State}`}</p>
+              <p className="text-slate-500 text-xs tracking-wide">Coordinates: {location?.coordinates}</p>
             </div>
-            <div className="relative w-full h-40 bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center border border-slate-700/50">
-              <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#10B981_1px,transparent_1px)] [background-size:20px_20px]"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                  <div className="absolute -inset-4 bg-primary/20 rounded-full blur-xl"></div>
-                  <span className="material-symbols-outlined text-primary text-5xl fill-1 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]">location_on</span>
+            <div className="relative w-full h-40 bg-slate-900 rounded-lg overflow-hidden border border-slate-700/50">
+              {location ? (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  src={`https://www.google.com/maps?q=${location.lat},${location.lng}&z=15&output=embed`}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-400">
+                  No location available
                 </div>
-              </div>
+              )}
+
               <div className="absolute bottom-3 right-3">
-                <a className="text-primary text-[10px] font-bold flex items-center gap-1 bg-background-dark/80 backdrop-blur px-2 py-1 rounded" href="#">
-                  Open Map <span className="material-symbols-outlined text-[10px]">north_east</span>
+                <a
+                  className="text-primary text-[10px] font-bold flex items-center gap-1 bg-background-dark/80 px-2 py-1 rounded"
+                  href={
+                    location
+                      ? `https://www.google.com/maps?q=${location.lat},${location.lng}`
+                      : "#"
+                  }
+                >
+                  Open Map
                 </a>
               </div>
+
             </div>
           </div>
         </section>
@@ -147,7 +193,7 @@ export default function PropertyDetail() {
             <div className="p-6 pb-4">
               <div className="mb-4">
                 <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Monthly Cost Summary</p>
-                <p className="text-3xl font-extrabold text-white mt-1">{property.monthlyCost}<span className="text-sm font-normal text-slate-400"> / month</span></p>
+                <p className="text-3xl font-extrabold text-white mt-1">{property.monthlyCost || "N/A"}<span className="text-sm font-normal text-slate-400"> / month</span></p>
               </div>
               <div className="w-full h-3 flex rounded-full overflow-hidden mb-5 bg-slate-700/50">
                 <div className="h-full bg-accent-blue" style={{ width: "79.6%" }} title="Mortgage"></div>
@@ -157,24 +203,24 @@ export default function PropertyDetail() {
               <div className="grid grid-cols-1 gap-2.5">
                 <div className="flex justify-between items-center text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-accent-blue"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                     <span className="text-slate-300">Mortgage</span>
                   </div>
-                  <span className="font-bold text-white">{property.mortgage}</span>
+                  <span className="font-bold text-white">{property.mortgage || "N/A"}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-accent-orange"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
                     <span className="text-slate-300">Commute & Tolls</span>
                   </div>
-                  <span className="font-bold text-white">{property.commute}</span>
+                  <span className="font-bold text-white">{property.commute || "N/A"}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-accent-purple"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
                     <span className="text-slate-300">Maintenance Fees</span>
                   </div>
-                  <span className="font-bold text-white">{property.maintenance}</span>
+                  <span className="font-bold text-white">{property.maintenance || "N/A"}</span>
                 </div>
               </div>
             </div>
@@ -186,11 +232,11 @@ export default function PropertyDetail() {
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="text-white text-lg font-extrabold">{property.principal}</span>
+                  <span className="text-white text-lg font-extrabold">{property.principal || "N/A"}</span>
                   <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Principal</span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-white text-lg font-extrabold">{property.interest}</span>
+                  <span className="text-white text-lg font-extrabold">{property.interest || "N/A"}</span>
                   <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Interest</span>
                 </div>
               </div>
@@ -200,23 +246,23 @@ export default function PropertyDetail() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Property Price</p>
-                  <p className="text-white font-bold text-sm">{property.propertyPrice}</p>
+                  <p className="text-white font-bold text-sm">{property.propertyPrice || "N/A"}</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Loan Amount</p>
-                  <p className="text-white font-bold text-sm">{property.loanAmount}</p>
+                  <p className="text-white font-bold text-sm">{property.loanAmount || "N/A"}</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Interest Rate</p>
-                  <p className="text-white font-bold text-sm">{property.interestRate}</p>
+                  <p className="text-white font-bold text-sm">{property.interestRate || "N/A"}</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Loan Tenure</p>
-                  <p className="text-white font-bold text-sm">{property.loanTenure}</p>
+                  <p className="text-white font-bold text-sm">{property.loanTenure || "N/A"}</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30 col-span-2">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Downpayment</p>
-                  <p className="text-white font-bold text-sm">{property.downpayment}</p>
+                  <p className="text-white font-bold text-sm">{property.downpayment || "N/A"}</p>
                 </div>
               </div>
             </div>
@@ -253,35 +299,37 @@ export default function PropertyDetail() {
                 <span className="material-symbols-outlined text-primary text-xl">home</span>
                 <div>
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Type</p>
-                  <p className="text-white text-sm font-semibold">Condominium</p>
+                  <p className="text-white text-sm font-semibold">
+                    {property.Property_Type}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary text-xl">assignment_turned_in</span>
                 <div>
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Tenure</p>
-                  <p className="text-white text-sm font-semibold">Freehold</p>
+                  <p className="text-white text-sm font-semibold">{property.Tenure}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary text-xl">layers</span>
                 <div>
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Floor Level</p>
-                  <p className="text-white text-sm font-semibold">High Floor</p>
+                  <p className="text-white text-sm font-semibold">{property.Floor_Level}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary text-xl">directions_car</span>
                 <div>
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Carpark</p>
-                  <p className="text-white text-sm font-semibold">Covered Car Park</p>
+                  <p className="text-white text-sm font-semibold">{property.Carpark}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 col-span-2">
                 <span className="material-symbols-outlined text-primary text-xl">sell</span>
                 <div>
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Price / sqft</p>
-                  <p className="text-white text-sm font-semibold">{property.pricePerSqft}</p>
+                  <p className="text-white text-sm font-semibold">RM {property.Median_PSF}</p>
                 </div>
               </div>
             </div>
@@ -318,11 +366,11 @@ export default function PropertyDetail() {
               </li>
               <li className="flex items-center justify-between border-t border-slate-700/50 pt-4">
                 <span className="text-slate-400 text-sm">Distance to MRT</span>
-                <span className="text-white font-bold">0.7 km</span>
+                <span className="text-white font-bold">{property.Distance_MRT_km || "N/A"} km</span>
               </li>
               <li className="flex items-center justify-between">
                 <span className="text-slate-400 text-sm">Distance to Highway</span>
-                <span className="text-white font-bold">1.2 km</span>
+                <span className="text-white font-bold">{property.Distance_Highway_km || "N/A"} km</span>
               </li>
             </ul>
           </div>
@@ -340,7 +388,7 @@ export default function PropertyDetail() {
               </div>
               <div>
                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">School</p>
-                <p className="text-white text-sm font-semibold">SMK Bangsar</p>
+                <p className="text-white text-sm font-semibold">{property.Nearby_School}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -349,7 +397,7 @@ export default function PropertyDetail() {
               </div>
               <div>
                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Mall</p>
-                <p className="text-white text-sm font-semibold">Bangsar Village</p>
+                <p className="text-white text-sm font-semibold">{property.Nearby_Mall}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -358,7 +406,7 @@ export default function PropertyDetail() {
               </div>
               <div>
                 <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Hospital</p>
-                <p className="text-white text-sm font-semibold">Pantai Hospital Kuala Lumpur</p>
+                <p className="text-white text-sm font-semibold">{property.Nearby_Hospital}</p>
               </div>
             </div>
           </div>
@@ -370,7 +418,7 @@ export default function PropertyDetail() {
             Facilities
           </h2>
           <div className="flex flex-wrap gap-3">
-            {['24h Security','Swimming Pool','Gym','Playground'].map((facility)=> (
+            {facilities.map((facility) => (
               <div key={facility} className="flex items-center gap-2 bg-slate-800/60 border border-slate-700/50 rounded-full px-4 py-2">
                 <span className="material-symbols-outlined text-primary text-sm font-bold">check</span>
                 <span className="text-white text-xs font-semibold">{facility}</span>
@@ -428,19 +476,8 @@ export default function PropertyDetail() {
               </button>
             </div>
           </nav>
-        </footer>
-
-        <style>{`
-          .accent-blue {
-            background-color: #3b82f6;
-          }
-          .accent-orange {
-            background-color: #f97316;
-          }
-          .accent-purple {
-            background-color: #a855f7;
-          }
-        `}</style>
+        </footer>   
+    
       </div>
     </div>
   );

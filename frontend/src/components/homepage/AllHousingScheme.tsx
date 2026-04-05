@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AllHousingScheme() {
@@ -11,60 +11,55 @@ export default function AllHousingScheme() {
     { id: "all", label: "All Schemes" },
     { id: "pr1ma", label: "PR1MA" },
     { id: "rumawip", label: "RUMAWIP" },
-    { id: "selangorku", label: "Selangorku" },
-    { id: "myhome", label: "MyHome" },
+    { id: "selangorku", label: "Selangorku" }
   ];
 
-  const properties = [
-    {
-      id: 1,
-      name: "Residensi Melawati",
-      price: "RM 380,000",
-      match: "92%",
-      beds: 3,
-      baths: 2,
-      sqft: "950 sqft",
-      status: "ELIGIBLE",
-      schemeTag: "PR1MA",
-      schemeBg: "bg-primary",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBvg-9tV6Aec4WMN3GV7v5DWNlIzltlkqjqhc3Z5w3MEdI_ssbgzsZvyuSE4owqJOrOhqeKA0ClkY-UMPF_ffF5H2xGUnHi3osRI40_c1m56uCW4Z5JeXk5fA-4gGkxBYzFOBw21p9-U7P2ICB4IjCXebmKm24ladeM2raZ9c43BOHPcuhctq8FuOc7iMcLcpd09qOSnYXbe6tU9BLP5RQBoRcveO2LpoNmInGYdOiVu5hFScX5w3SEiSVhh3mC6WrcfXT3YBxKBpw",
-    },
-    {
-      id: 2,
-      name: "SkyAwani V Residence",
-      price: "RM 300,000",
-      match: "88%",
-      beds: 3,
-      baths: 2,
-      sqft: "800 sqft",
-      status: "ELIGIBLE",
-      schemeTag: "RUMAWIP",
-      schemeBg: "bg-blue-600",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuAL32lNXPUSTCWxeB9l2_MWnBx8KHPNYn1UH83reTVOhkhfB4mt2ciczCzdpfGOqdfOuLN07km1AmXNPifkGsFxIce1zqf_3nOAJTSLlB66qqPx4Rj0UvWpkD1uNS_GWSTNRiyIGmk_Pk_UqyqN8oUNY_dH7hP7m8DPJ1T1b3IdVMo-UepRtB5sGS1Fe3ChBxHOLRH23iI50oiKC5eogb28T7niIClF_hQFB7b4p7QwP-ZmlcZ8CDxY03OY-hBTTSe0OFDNOx4L5qQ",
-    },
-    {
-      id: 3,
-      name: "Serene Heights",
-      price: "RM 250,000",
-      match: "75%",
-      beds: 3,
-      baths: 2,
-      sqft: "900 sqft",
-      status: "CHECK STATUS",
-      schemeTag: "Selangorku",
-      schemeBg: "bg-amber-600",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBQnvzsy9iZ7wmuYih5_XYI7K0_NOgS3PWnkpUNGFxMX7h1rHt-O6foBSEYv5K06WaFj_YJ1lIldZ24SGFNcHyRAfHwIDRVia4CqS9_Xspy1LC9D-NlgpMInhRhym_3lE3dy42-t9uy8fVhTnYV9HkVqieN8LnTcr-ecM5mDaRn7_m8xdqDItAA9ju3De2zNTQ_A4x3vOEvS7_FUl9LDz61zAIDoaxM2KOGubxmPiYzWHZ4bJoecEz2FF0SXt8wAf9L9vOtpheNpdQ",
-    },
-  ];
+  const [properties, setProperties] = useState<any[]>([]);
 
   const toggleFavorite = (id: number) => {
     setFavorites((prev) =>
       prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]
     );
   };
+
+  useEffect(() => {
+  async function fetchData() {
+    try {
+      //ni TUKAR
+      const user = {
+        employmentDetails: {
+          workplaceLat: 3.1319,
+          workplaceLng: 101.6841,
+        },
+        propertyPreferences: {
+          maxBudget: 500000,
+        },
+      };
+
+      const res = await fetch("http://localhost:5000/recommendations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      const data = await res.json();
+
+      //ONLY SCHEME
+      const schemeOnly = data.filter(
+        (p: any) => p.propertyType === "scheme"
+      );
+
+      setProperties(schemeOnly);
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  fetchData();
+}, []);
 
   return (
     <div className="dark">
@@ -122,83 +117,71 @@ export default function AllHousingScheme() {
           <div className="p-4 space-y-6">
             {properties.map((property) => (
               <button
-                key={property.id}
-                onClick={() => navigate("/property-detail")}
-                className="group relative flex flex-col bg-white dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-navy-700 hover:shadow-md hover:border-primary/30 transition-shadow text-left w-full"
+              key={property.Property_ID}
+              onClick={() => navigate(`/property/${property.Property_ID}`)}
+              className="flex flex-col rounded-xl overflow-hidden bg-surface-dark shadow-xl shadow-black/5 border border-slate-800 transition-transform active:scale-[0.98] hover:shadow-2xl hover:shadow-black/20 hover:border-primary/30 text-left w-full"
+            >
+              <div
+                className="relative w-full aspect-[16/10] bg-center bg-no-repeat bg-cover"
+                style={{ backgroundImage: `url("${property.propertyImage}")` }}
               >
-                <div
-                  className="relative aspect-video w-full bg-cover bg-center"
-                  style={{ backgroundImage: `url('${property.image}')` }}
+                <div className="absolute top-3 left-3 bg-primary text-white text-[15px] font-bold px-2 py-1 rounded-md shadow-lg uppercase tracking-wider">
+                  {property.matchScore}% Match
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(property.id);
+                  }}
+                  className="absolute top-3 right-3 p-2 rounded-full bg-white/20 backdrop-blur-md transition-colors hover:text-red-400"
                 >
-                  <div className={`absolute top-3 left-3 ${property.schemeBg} text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider`}>
-                    {property.schemeTag}
-                  </div>
+                  <span
+                    className={`material-symbols-outlined text-[22px] ${
+                      favorites.includes(property.id) ? "fill-1 text-red-400" : "text-white"
+                    }`}
+                  >
+                    favorite
+                  </span>
+                </button>
+              </div>
 
-                  <div className="absolute top-3 right-3 flex flex-col gap-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleFavorite(property.id);
-                      }}
-                      className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/40 transition-all"
-                    >
-                      <span
-                        className={`material-symbols-outlined text-xl ${
-                          favorites.includes(property.id) ? "fill-1 text-red-400" : ""
-                        }`}
-                      >
-                        favorite
-                      </span>
-                    </button>
-                  </div>
+              <div className="flex flex-col p-4 gap-2">
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="text-white font-bold text-lg">
+                    {property.Property_Name}
+                  </h4>
+                </div>
 
-                  <div className="absolute bottom-3 left-3 flex gap-2">
-                    <span className="bg-primary/90 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs">verified</span>
-                      {property.match} Match
-                    </span>
+                {/* Price */}
+                <p className="text-primary font-extrabold text-2xl mb-3">
+                  RM {property.Median_Price?.toLocaleString()}
+                </p>
+
+                <div className="flex items-center gap-4 text-slate-400 text-sm mb-4 border-b border-slate-800 pb-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-lg">bed</span>
+                    <span>{property.Bedroom}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-lg">bathtub</span>
+                    <span>{property.Toilet}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-lg">square_foot</span>
+                    <span>{property.Floor_Area_sqft}</span>
                   </div>
                 </div>
 
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                      {property.name}
-                    </h3>
-                    <span
-                      className={`text-xs font-bold flex items-center gap-1 ${
-                        property.status === "ELIGIBLE"
-                          ? "text-primary"
-                          : "text-slate-500 dark:text-slate-400"
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-sm">
-                        {property.status === "ELIGIBLE" ? "check_circle" : "info"}
-                      </span>
-                      {property.status}
+                <div className="mt-2 flex items-center">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold">
+                    <span className="material-symbols-outlined text-sm font-bold">
+                      check_circle
                     </span>
-                  </div>
-
-                  <p className="text-xl font-extrabold text-slate-900 dark:text-slate-100 mb-3">
-                    {property.price}
-                  </p>
-
-                  <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 text-sm">
-                    <div className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-lg">bed</span>
-                      <span>{property.beds}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-lg">bathtub</span>
-                      <span>{property.baths}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-lg">square_foot</span>
-                      <span>{property.sqft}</span>
-                    </div>
-                  </div>
+                    {property.feature}
+                  </span>
                 </div>
-              </button>
+              </div>
+            </button>
             ))}
           </div>
         </main>

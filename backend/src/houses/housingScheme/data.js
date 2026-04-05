@@ -19,26 +19,10 @@ const schemes = [
   },
 
   {
-    name: "Rumah Selangorku",
+    name: "Selangorku",
     minAge: 18,
     incomeMax: 10000,
     locations: ["Selangor"],
-    firstHomeRequired: true
-  },
-
-  {
-    name: "Skim Rumah Pertamaku",
-    minAge: 18,
-    incomeMax: 10000,
-    locations: ["Kuala Lumpur", "Selangor"],
-    firstHomeRequired: true
-  },
-
-  {
-    name: "PPR",
-    minAge: 18,
-    incomeMax: 3000,
-    locations: ["Kuala Lumpur", "Selangor"],
     firstHomeRequired: true
   }
 

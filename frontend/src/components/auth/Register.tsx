@@ -87,6 +87,8 @@ export default function SmartRumahCombinedPage() {
     jobSector: "Private Sector",
     yearsOfEmployment: 5,
     workplaceLocation: "KLCC, Kuala Lumpur",
+    workplaceLat: null as number | null,
+    workplaceLng: null as number | null,
 
     preferredState: "Kuala Lumpur",
     maxBudget: 450000,
@@ -113,6 +115,7 @@ export default function SmartRumahCombinedPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+
   const togglePriority = (label: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -130,6 +133,32 @@ export default function SmartRumahCombinedPage() {
         : [...prev.selectedSchemes, scheme],
     }));
   };
+
+  const handleSubmit = async () => {
+  try {
+    const userId = "testUser123"; // temporary
+
+    const res = await fetch("http://localhost:5000/users/profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        formData, // THIS sends workplaceLat & workplaceLng
+      }),
+    });
+
+    const data = await res.json();
+    console.log("Saved:", data);
+
+    // redirect after save
+    window.location.href = "/";
+
+  } catch (err) {
+    console.error("Error saving:", err);
+  }
+};
 
   const allSchemesSelected = useMemo(
     () => formData.selectedSchemes.length === schemeOptions.length,
@@ -422,6 +451,23 @@ export default function SmartRumahCombinedPage() {
                       value={formData.workplaceLocation}
                       onChange={(e) => handleChange("workplaceLocation", e.target.value)}
                     />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                          handleChange("workplaceLat", pos.coords.latitude);
+                          handleChange("workplaceLng", pos.coords.longitude);
+
+                          handleChange(
+                            "workplaceLocation",
+                            "Current Location 📍"
+                          );
+                        });
+                      }}
+                      className="mt-3 w-full rounded-xl bg-emerald-500/10 py-2 text-sm font-semibold text-emerald-400 hover:bg-emerald-500/20"
+                    >
+                      Use My Current Location 📍
+                    </button>
                   </div>
                 </Field>
               </div>
@@ -832,7 +878,7 @@ export default function SmartRumahCombinedPage() {
             
 
             <button
-              onClick={goToHome}
+              onClick={handleSubmit}
               className="flex w-full items-center justify-center gap-2 rounded-3xl bg-emerald-500 px-6 py-4 text-lg font-extrabold text-white shadow-[0_10px_30px_rgba(16,185,129,0.28)] transition hover:brightness-110 active:scale-[0.98]"
             >
               <span>Set My Profile</span>

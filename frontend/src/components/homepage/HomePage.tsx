@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AllProperty from "./AllProperty";
 import HousingScheme from "./HousingScheme";
@@ -8,11 +8,61 @@ import ProfileEdit from "../profile/ProfileEdit";
 import SearchPage from "../search/SearchPage";
 import SavedPage from "../saved/SavedPage";
 
-export default function HomeDashboard() {
-    const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  
+export type Property = {
+  Property_ID: string;
+  Property_Name: string;
+  Median_Price: number;
+  Bedroom: number;
+  Toilet: number;
+  Floor_Area_sqft: number;
+  propertyImage: string;
+  State: string;
+  matchScore: number; 
+};
 
+export default function HomeDashboard() {
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [properties, setProperties] = useState<any[]>([]);
+
+  useEffect(() => {
+  async function fetchData() {
+    try {
+      // ni hardcoded dullu sbb firestore belum siap, nanti kena adjust ikut data user sebenar
+      const user = {
+        employmentDetails: {
+          workplaceLocation: "Bangsar", // optional
+          workplaceLat: 3.1319,   
+          workplaceLng: 101.6841  
+        },
+        propertyPreferences: {
+          maxBudget: 500000,
+        },
+      };
+
+      //const user = firestoreUserData -> ni time firestore dh siap
+
+       const res = await fetch("http://localhost:5000/recommendations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user), 
+      });
+
+      const data = await res.json();
+      console.log("DATA:", data);
+
+      setProperties(data);
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  fetchData();
+}, []);
+  
   const categories = [
     { id: "all", label: "All Homes" },
     { id: "condo", label: "Condominium" },
@@ -20,9 +70,16 @@ export default function HomeDashboard() {
     { id: "studio", label: "Studio" },
   ];
 
-  
+  const regularProperties = properties.filter(
+    (p) => p.propertyType === "regular"
+  );
+
+  const schemeProperties = properties.filter(
+    (p) => p.propertyType === "scheme"
+  );
 
   return (
+    
     <div className="dark">
       <div className="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col">
         {/* Top Header */}
@@ -143,143 +200,88 @@ export default function HomeDashboard() {
 
           {/* Property Carousel */}
           <section className="flex gap-5 px-6 py-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">
-            {/* Card 1 */}
+            {regularProperties.map((property) => (
             <button
-              onClick={() => navigate("/property-detail")}
-              className="min-w-[280px] w-[80vw] bg-card-dark rounded-2xl border border-slate-800 overflow-hidden snap-start group text-left hover:border-primary/30 transition-colors"
+              key={property.Property_ID}
+              onClick={() => navigate(`/property/${property.Property_ID}`)}
+              className="min-w-[280px] w-[80vw] bg-card-dark rounded-2xl border border-slate-800 overflow-hidden snap-start group text-left transition-all hover:scale-[1.02]"
             >
+              {/* IMAGE */}
               <div className="relative h-48">
+
+                {/* Image */}
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                   style={{
-                    backgroundImage:
-                      "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCT6g2EU0GL28y-6sp5fIDnAotg0eQf1Y6DcURPKrfYu6z-sRfFNJ3VmdcRTgPCnS4dlS5ABwUNEBLlQoGtNFtnTS5un7jCrabMXPns1qLeVveCTvdUOOL1zwUFG8vIKZCkj0Ki8SmAnzgTTmZcVMjd3O8hiNdbmio27s8xkyvvlpe38o7k1OQPU4GEtYFgCHtYT0o7D25sbbip_rUuRuiMOqSQhvCM9sAielHwo-TaH7tnbwS7KlXdg5wPGJAYZwXJjOPx5GigPms')",
+                    backgroundImage: `url('${property.propertyImage}')`,
                   }}
-                ></div>
+                />
 
+                {/* Match Score */}
                 <div className="absolute top-3 right-3 bg-primary text-background-dark px-3 py-1.5 rounded-lg text-xs font-black shadow-[0_0_15px_rgba(16,185,129,0.4)] flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px] fill-1">
-                    star
-                  </span>
-                  92% Match
+                  <span className="material-symbols-outlined text-[14px] fill-1">star</span>
+                  {property.matchScore}% Match
                 </div>
 
+                {/* Scheme */}
                 <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] text-white uppercase font-bold tracking-widest">
-                  New Launch
+                  {property.Housing_Scheme || "FEATURED"}
                 </div>
               </div>
 
+              {/* CONTENT */}
               <div className="p-4">
+
+                {/* Title + Heart */}
                 <div className="flex justify-between items-start mb-1">
                   <h4 className="text-white font-bold text-lg">
-                    Residensi Melawati
+                    {property.Property_Name}
                   </h4>
+
                   <span className="material-symbols-outlined text-slate-500 cursor-pointer">
                     favorite
                   </span>
                 </div>
 
+                {/* Price */}
                 <p className="text-primary font-extrabold text-xl mb-3">
-                  RM 380,000
+                  RM {property.Median_Price?.toLocaleString()}
                 </p>
 
+                {/* Details */}
                 <div className="flex items-center gap-4 text-slate-400 text-sm mb-4 border-b border-slate-800 pb-4">
+
                   <div className="flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-sm">bed</span>
-                    <span>3</span>
+                    <span>{property.Bedroom}</span>
                   </div>
+
                   <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm">
-                      bathtub
-                    </span>
-                    <span>2</span>
+                    <span className="material-symbols-outlined text-sm">bathtub</span>
+                    <span>{property.Toilet}</span>
                   </div>
+
                   <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm">
-                      square_foot
-                    </span>
-                    <span>950 sqft</span>
+                    <span className="material-symbols-outlined text-sm">square_foot</span>
+                    <span>{property.Floor_Area_sqft} sqft</span>
                   </div>
                 </div>
 
+                {/* Bottom Tag */}
                 <div className="flex items-center gap-2">
                   <div className="size-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-[14px] font-bold">
+                    <span className="material-symbols-outlined text-primary text-[14px]">
                       check_circle
                     </span>
                   </div>
+
                   <span className="text-emerald-500 text-xs font-bold uppercase tracking-tight">
-                    Zero Flood Risk
+                    {property.Near_MRT === "Yes" ? "Near MRT" : "Good Location"}
                   </span>
                 </div>
               </div>
             </button>
-
-            {/* Card 2 */}
-            <button
-              onClick={() => navigate("/property-detail")}
-              className="min-w-[280px] w-[80vw] bg-card-dark rounded-2xl border border-slate-800 overflow-hidden snap-start group text-left hover:border-primary/30 transition-colors"
-            >
-              <div className="relative h-48">
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage:
-                      "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB9XS-KE2q391aFknz7d8P5kuVrHFre96N812ZNFF6QT5_kVeji4l8inLPwXKNDwQ7mfFjI9Ib5UdmXkRPl-yfzUV6g4yxQlyvlGfI3no0QFdx1WXRNfyYnnJnzThpdfEz1cm70cC_FCqWEODmx0oy6gqipGXX1qlorOkJGaVOZPtx-G4PJWe2Rd7xLTyCGLzd_MCv_2nA_fkKOEOgu-i62ghop-2DRqLOTM75ucVSzH9Ql2OoybHIRSuCXwmogfZqoAa3VvO9bvhE')",
-                  }}
-                ></div>
-
-                <div className="absolute top-3 right-3 bg-primary text-background-dark px-3 py-1.5 rounded-lg text-xs font-black shadow-[0_0_15px_rgba(16,185,129,0.4)] flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px] fill-1">
-                    star
-                  </span>
-                  88% Match
-                </div>
-              </div>
-
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="text-white font-bold text-lg">The Green Urban</h4>
-                  <span className="material-symbols-outlined text-slate-500">
-                    favorite
-                  </span>
-                </div>
-
-                <p className="text-primary font-extrabold text-xl mb-3">
-                  RM 425,000
-                </p>
-
-                <div className="flex items-center gap-4 text-slate-400 text-sm mb-4 border-b border-slate-800 pb-4">
-                  <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm">bed</span>
-                    <span>3</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm">
-                      bathtub
-                    </span>
-                    <span>3</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-sm">
-                      square_foot
-                    </span>
-                    <span>1,200 sqft</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="size-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-primary text-[14px] font-bold">
-                      check_circle
-                    </span>
-                  </div>
-                  <span className="text-emerald-500 text-xs font-bold uppercase tracking-tight">
-                    Freehold Property
-                  </span>
-                </div>
-              </div>
-            </button>
+          ))}
           </section>
 
           {/* Helpful Tools */}
