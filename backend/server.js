@@ -10,6 +10,8 @@ const regularHouseRoutes = require("./src/houses/regularHouses/routes");
 const mapRoutes = require("./src/map/routes");
 const recommendationRoutes = require("./src/recommendation/routes");
 const propertyRoutes = require("./src/houses/property.routes");
+const riskRoutes = require("./src/riskDetection/risk.routes");
+
 
 app.use(cors())
 app.use(express.json())
@@ -21,6 +23,7 @@ app.use("/map", mapRoutes);
 app.use("/users", userRoutes);
 app.use("/recommendations", recommendationRoutes);
 app.use("/properties", propertyRoutes);
+app.use("/api", riskRoutes);
 
 
 app.get("/", (req,res)=>{

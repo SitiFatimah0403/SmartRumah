@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("Mont Kiara");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [hasSearched, setHasSearched] = useState(false);
   const [recentSearches, setRecentSearches] = useState([
@@ -12,91 +12,55 @@ export default function SearchPage() {
     "Bangsar South Bungalow",
   ]);
   const [savedItems, setSavedItems] = useState<number[]>([]);
+  const [sortType, setSortType] = useState<"none" | "low" | "high">("none");;
 
   const categories = [
     { id: "all", label: "All Homes", icon: "grid_view" },
     { id: "apartment", label: "Apartment", icon: "apartment" },
-    { id: "condo", label: "Condo", icon: "home_work" },
-    { id: "landed", label: "Landed", icon: "villa" },
-    { id: "house", label: "House", icon: "home" },
+    { id: "condominium", label: "Condo", icon: "home_work" },
+    { id: "Semi D", label: "Semi D", icon: "villa" },
+    { id: "other", label: "Other", icon: "home" },
   ];
+  const [properties, setProperties] = useState<any[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
+
+  const toggleSort = () => {
+    const newType = sortType === "low" ? "high" : "low";
+
+    setSortType(newType);
+
+    const sorted = sortProperties(filteredProperties, newType);
+    setFilteredProperties(sorted);
+  };
 
   const featuredAreas = [
     {
       id: 1,
       name: "Kuala Lumpur",
-      count: "1,240 properties",
+      count: "20 properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuCd9ziQmieN5_83eNOvudtUU7Yt6zW7KEvVWu3Dd1jRrk7miaXWyPByo63e_-XdXyMT-NVMhIJNcKBQjQhrrdYMKfIi0vqMKYyywM9vtO-tV09HlFHyByUequ2MmB10xEp5D_nfE1O8HcxWZtzVih9IlFQUgD-elt2BtAhMOZZZqVEvD_PjUwi9yUevPfMozewum1mO2OW95PbJ0uXQshFERsBVsaaugEymBtk9xqaYRp2OtRj8ndZvUXyGcEyWDKcXl9rTF-2an1U",
     },
     {
       id: 2,
-      name: "Cyberjaya",
-      count: "840 properties",
+      name: "Putrajaya",
+      count: "20 properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDGrmunf4UQFNQDSH_58qtOjduBzpBgrtlPj5gYX9FEwbX531QFvHoC-nTVABfoLaG_P4Avgwk8DugRDdcFETLrrDhZdrhJ7mAP0UQxLBDORQw_VmHxQozy5qhYtVNK28xOK6ccizF3UVMvAKGOKxkZmKFozEz-s6IiPnFYbUbPDiCN3VQ3vMl-ixZRbsnpf2a7yawKBRzsxHN2zPgFUYtaO689W7LlJJRUFSJyatDoWtczjLCGOi0ilVXxV3Twd5R0qGEpHS1mKyg",
     },
     {
       id: 3,
-      name: "Mont Kiara",
-      count: "520 properties",
+      name: "Selangor",
+      count: "20 properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuCzuSa_9boX2apdjiYOjwVcIBQNMJRV57e7KB_a8UdYFFGHSMTfNV5CbFzzZITDLUxy6zcWfvfwWjaPRjCysgglaQTMct3uBsCEF08zW_rHsOuP_tIjzvGM7tUDJHefdjNYXn5jE85wcpwsYpSV8x4E7KYelHZjbeQcQBaFhhDR3su_CECoFjAmEuf_4Za5MFyu773-zDIzf3IhIF81TEHa-aFIRVvt3iQQS5kclp325VCejFYVguP0TZDhUtdaqw2P-9I7CmJp41o",
     },
     {
       id: 4,
-      name: "Petaling Jaya",
-      count: "980 properties",
+      name: "Coming Soon",
+      count: "- properties",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuA2IkP9ylsmEZsnGiMLezfMh4lWLE0PnRjVxeYXxziWb_u7Ag2tH4qrxwfGGHtL-plpzlv03GwFkpigCWb2nQx8Zar_bztiBaeTQCZcIpuL6CpNLUW-x7KkDGlrtla8XoornOoulXBaI1YB-IvDH7qwIx_AqJWIWS7g060DFWNonWxVwZ925-PQnYrOEOih173_psgaoMpLFqR56BI3Xf5-xWZuaWxr--5n86Y5KHbqgHvtvy5Gr9JfOPMYwcL8g5k7MVnCgiGycS8",
-    },
-  ];
-
-  const properties = [
-    {
-      id: 1,
-      name: "Mont Kiara Luxury Condo",
-      price: "RM 1,250,000",
-      location: "Jalan Kiara, Mont Kiara, Kuala Lumpur",
-      beds: 3,
-      baths: 2,
-      sqft: "1,250",
-      matchScore: "92%",
-      flood: "Low",
-      landslide: "Low",
-      safety: "92",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuDRB7qkqMrKtb9oWciW2SWyKarMPuocuVvv9QZxN-HPbdlIAtj2txCZ2aWDmZtwpKvHxcP8RY_0IhZg-jb-iX-bkZrwd1A47FH9BYyp-NsWPdVkGyDlqVkHsa-VnBH9RwNZ3OxXN0B1AfsqODbWxWTj0A4VK5j38uH21gyc3O55Bx9UuZdu4wZ1REr9WM6WrWoLIFhEfbM0QrsBsTwHYJk98gk2U7WuaNg1fHApl5emjYa4UfpxMdcASENCnNcxiHBeN9YPYia8hRc",
-    },
-    {
-      id: 2,
-      name: "Kiara 163 Serviced Suites",
-      price: "RM 980,000",
-      location: "Mont Kiara, KL",
-      beds: 2,
-      baths: 2,
-      sqft: "850",
-      matchScore: "92%",
-      flood: "Low",
-      landslide: "Low",
-      safety: "98",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBQR1vPFx1WRAAhvfCMeP3beUFmpf_lGRqbB108FUgzbBhh2vG49updp2exNLw24J-qId6R32NXkL2mWkTxNyFl5Gfpxpw2FWFzNpmSS-iQBRSf7BmYEQX8qJM9zMIv0a3MZZWi1R6qyMtG7TLAzJkyU7E24F4crkEW2t7USiV3EQ1noO5grUCaEIBKQOs6x9QidRd5Xf_NTbA-ZrC7M0_lObDGAZHsx1oXgXAKUUzqaRpfYZyJLfpnR7ZTtAIEsUF9TY2uNJIbZIQ",
-    },
-    {
-      id: 3,
-      name: "Residensi 22 Penthouse",
-      price: "RM 2,450,000",
-      location: "North Kiara, Mont Kiara",
-      beds: 4,
-      baths: 4,
-      sqft: "2,900",
-      matchScore: "92%",
-      flood: "Low",
-      landslide: "Low",
-      safety: "95",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBCN_fcSQswehc1d8d4n04pKtfdUMYDMv4eqWY_LyIV-LP2IiD3Oatu86Zd-iqJpoZD9uXgcY1os7atglVD3Qr56Ne3ZqQuxqaP3hJLJRzDfmpmWCteBVnHzkYk6bW1e4yq89LdShz5MuTPpvT7Aykg0UEEpTyM_K2xnTfC4NgCht5-ZPACVKbUeB7nAdu-qAOaPV5XY1FT7ep_R-y5bVR6-8KgKGLlfmO6dLiDmB-CdDi0EQL-iuvua7aLZq4DNwokRR3KsrHKmsw",
     },
   ];
 
@@ -117,12 +81,87 @@ export default function SearchPage() {
     );
   };
 
+  const handleAreaClick = (areaName: string) => {
+    setSearchQuery(areaName);     // fill search box
+    setHasSearched(true);         // switch to result view
+
+    const query = areaName.toLowerCase();
+
+    const filtered = properties.filter((p) => {
+      return (
+        p.Township?.toLowerCase().includes(query) ||
+        p.State?.toLowerCase().includes(query)
+      );
+    });
+
+    setFilteredProperties(filtered);
+  };
+
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    setHasSearched(true);
+
+    const query = searchQuery.trim().toLowerCase();
+
+    const mainTypes = [
+      "apartment",
+      "condominium",
+      "semi d"
+    ];
+
+    const filtered = properties.filter((p) => {
+      const matchSearch =
+        p.Township?.toLowerCase().includes(query) ||
+        p.State?.toLowerCase().includes(query) ||
+        p.Property_Name?.toLowerCase().includes(query);
+
+      const matchCategory =
+        category === "all"
+          ? true
+          : category === "other"
+            ? !mainTypes.includes(p.Property_Type?.toLowerCase())
+            : p.Property_Type?.toLowerCase().includes(category.toLowerCase());
+
+      return matchSearch && matchCategory;
+    });
+
+    setFilteredProperties(filtered);
+  };
+  const sortProperties = (data: any[], type: string) => {
+    return [...data].sort((a, b) => {
+      if (type === "low") return a.Median_Price - b.Median_Price;
+      if (type === "high") return b.Median_Price - a.Median_Price;
+      return 0;
+    });
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setHasSearched(true);
-    if (searchQuery && !recentSearches.includes(searchQuery)) {
-      setRecentSearches([searchQuery, ...recentSearches.slice(0, 2)]);
+
+    const query = searchQuery.trim().toLowerCase();
+
+    let filtered = properties.filter((p) => {
+      const matchSearch =
+        p.Township?.toLowerCase().includes(query) ||
+        p.State?.toLowerCase().includes(query) ||
+        p.Property_Type?.toLowerCase().includes(query) ||
+        p.Property_Name?.toLowerCase().includes(query) ||
+        p.Area?.toLowerCase().includes(query);
+
+      const matchCategory =
+        selectedCategory === "all" ||
+        p.Property_Type?.toLowerCase() === selectedCategory;
+
+      return matchSearch && matchCategory;
+    });
+
+    // ✅ APPLY SORT AFTER FILTER
+    if (sortType !== "none") {
+      filtered = sortProperties(filtered, sortType);
     }
+
+    setFilteredProperties(filtered);
   };
 
   const clearSearch = () => {
@@ -132,6 +171,16 @@ export default function SearchPage() {
   const removeRecentSearch = (search: string) => {
     setRecentSearches(recentSearches.filter((s) => s !== search));
   };
+
+  useEffect(() => {
+    fetch("http://localhost:5000/houses")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("DATA:", data); // DEBUG
+        setProperties(data);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <div className="dark">
@@ -179,12 +228,11 @@ export default function SearchPage() {
             {categories.map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
-                  selectedCategory === cat.id
-                    ? "bg-primary text-white"
-                    : "bg-card-dark text-slate-300 border border-slate-800 hover:border-slate-700"
-                }`}
+                onClick={() => handleCategoryClick(cat.id)}
+                className={`flex items-center gap-1 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${selectedCategory === cat.id
+                  ? "bg-primary text-white"
+                  : "bg-card-dark text-slate-300 border border-slate-800 hover:border-slate-700"
+                  }`}
               >
                 <span className="material-symbols-outlined text-sm">{cat.icon}</span>
                 {cat.label}
@@ -233,7 +281,11 @@ export default function SearchPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {featuredAreas.map((area) => (
-                    <div key={area.id} className="relative h-40 rounded-2xl overflow-hidden group cursor-pointer">
+                    <div
+                      key={area.id}
+                      onClick={() => handleAreaClick(area.name)}
+                      className="relative h-40 rounded-2xl overflow-hidden group cursor-pointer"
+                    >
                       <img
                         alt={area.name}
                         src={area.image}
@@ -290,95 +342,108 @@ export default function SearchPage() {
             <>
               <div className="flex items-center justify-between">
                 <p className="text-slate-400 text-sm font-medium">
-                  {properties.length} properties found in <span className="text-primary font-bold">{searchQuery}</span>
+                  {filteredProperties.length} properties found in <span className="text-primary font-bold">{searchQuery}</span>
                 </p>
-                <button className="text-primary text-xs font-bold flex items-center gap-1 hover:text-primary/80">
-                  SORT BY <span className="material-symbols-outlined text-xs">sort</span>
+                <button
+                  onClick={toggleSort}
+                  className="text-primary text-xs font-bold flex items-center gap-1 hover:text-primary/80"
+                >
+                  SORT BY PRICE
+
+                  <span className="material-symbols-outlined text-xs">
+                    {sortType === "low" ? "arrow_upward" :
+                      sortType === "high" ? "arrow_downward" :
+                        "sort"}
+                  </span>
                 </button>
               </div>
 
               <div className="space-y-6">
-                {properties.map((property) => (
-                  <div
-                    key={property.id}
-                    className="group relative bg-card-dark rounded-2xl overflow-hidden border border-slate-800 shadow-sm hover:shadow-md transition-all"
-                  >
-                    <div className="relative h-56 w-full">
-                      <img
-                        alt={property.name}
-                        src={property.image}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-3 right-3 flex flex-col gap-2">
-                        <button
-                          onClick={() => toggleSaved(property.id)}
-                          className="bg-slate-900/80 backdrop-blur p-2 rounded-full text-slate-100 shadow-sm hover:bg-slate-800 transition-colors"
-                        >
-                          <span className={`material-symbols-outlined text-xl ${savedItems.includes(property.id) ? "fill-1 text-primary" : ""}`}>
-                            bookmark
+                {filteredProperties.map((property) => {
+                  console.log("Image URL:", property.propertyImage); //utk debug image problem
+                  return (
+                    <div
+                      key={property.Property_ID}
+                      className="group relative bg-card-dark rounded-2xl overflow-hidden border border-slate-800 shadow-sm hover:shadow-md transition-all"
+                    >
+                      <div className="relative h-56 w-full">
+                        <img
+                          alt={property.Property_Name}
+                          src={property.propertyImage}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 right-3 flex flex-col gap-2">
+                          <button
+                            onClick={() => toggleSaved(property.Property_ID)}
+                            className="bg-slate-900/80 backdrop-blur p-2 rounded-full text-slate-100 shadow-sm hover:bg-slate-800 transition-colors"
+                          >
+                            <span className={`material-symbols-outlined text-xl ${savedItems.includes(property.Property_ID) ? "fill-1 text-primary" : ""}`}>
+                              bookmark
+                            </span>
+                          </button>
+                        </div>
+                        <div className="absolute top-3 left-3">
+                          <span className="bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                            {property.matchScore} Match
                           </span>
-                        </button>
+                        </div>
+                        <div className="absolute bottom-3 left-3 bg-slate-900/60 backdrop-blur px-3 py-1 rounded-lg text-white text-sm font-bold">
+                          RM {property.Median_Price.toLocaleString()}
+                        </div>
                       </div>
-                      <div className="absolute top-3 left-3">
-                        <span className="bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-lg">
-                          {property.matchScore} Match
-                        </span>
-                      </div>
-                      <div className="absolute bottom-3 left-3 bg-slate-900/60 backdrop-blur px-3 py-1 rounded-lg text-white text-sm font-bold">
-                        {property.price}
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <div className="flex justify-between items-start mb-1">
-                        <h3 className="text-lg font-bold text-slate-100 leading-tight">{property.name}</h3>
-                      </div>
-                      <p className="text-slate-500 text-sm flex items-center gap-1 mb-3">
-                        <span className="material-symbols-outlined text-sm text-primary">location_on</span>
-                        {property.location}
-                      </p>
-                      <div className="flex items-center justify-between border-t border-slate-800 pt-3">
-                        <div className="flex flex-1 gap-4">
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-2 text-slate-400">
-                              <span className="material-symbols-outlined text-base">bed</span>
-                              <span className="text-sm font-semibold">{property.beds} Beds</span>
+                      <div className="p-4">
+                        <div className="flex justify-between items-start mb-1">
+                          <h3 className="text-lg font-bold text-slate-100 leading-tight">{property.Property_Name}</h3>
+                        </div>
+                        <p className="text-slate-500 text-sm flex items-center gap-1 mb-3">
+                          <span className="material-symbols-outlined text-sm text-primary">location_on</span>
+                          {property.Area}
+                        </p>
+                        <div className="flex items-center justify-between border-t border-slate-800 pt-3">
+                          <div className="flex flex-1 gap-4">
+                            <div className="flex-1 space-y-2">
+                              <div className="flex items-center gap-2 text-slate-400">
+                                <span className="material-symbols-outlined text-base">bed</span>
+                                <span className="text-sm font-semibold">{property.Bedroom} Beds</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-slate-400">
+                                <span className="material-symbols-outlined text-base">bathtub</span>
+                                <span className="text-sm font-semibold">{property.Toilet} Baths</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-slate-400">
+                                <span className="material-symbols-outlined text-base">square_foot</span>
+                                <span className="text-sm font-semibold">{property.Floor_Area_sqft} sqft</span>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2 text-slate-400">
-                              <span className="material-symbols-outlined text-base">bathtub</span>
-                              <span className="text-sm font-semibold">{property.baths} Baths</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-slate-400">
-                              <span className="material-symbols-outlined text-base">square_foot</span>
-                              <span className="text-sm font-semibold">{property.sqft} sqft</span>
-                            </div>
-                          </div>
-                          <div className="flex-1 space-y-2 border-l border-slate-800 pl-4">
-                            <div className="flex items-center gap-2 text-primary">
-                              <span className="material-symbols-outlined text-base">water_drop</span>
-                              <span className="text-[10px] font-bold uppercase tracking-tight">Flood: {property.flood}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-primary">
-                              <span className="material-symbols-outlined text-base">terrain</span>
-                              <span className="text-[10px] font-bold uppercase tracking-tight">Landslide: {property.landslide}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-primary">
-                              <span className="material-symbols-outlined text-base">shield</span>
-                              <span className="text-[10px] font-bold uppercase tracking-tight">Safety: {property.safety}</span>
+                            <div className="flex-1 space-y-2 border-l border-slate-800 pl-4">
+                              <div className="flex items-center gap-2 text-primary">
+                                <span className="material-symbols-outlined text-base">water_drop</span>
+                                <span className="text-[10px] font-bold uppercase tracking-tight">Flood: {property.flood}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-primary">
+                                <span className="material-symbols-outlined text-base">terrain</span>
+                                <span className="text-[10px] font-bold uppercase tracking-tight">Landslide: {property.landslide}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-primary">
+                                <span className="material-symbols-outlined text-base">shield</span>
+                                <span className="text-[10px] font-bold uppercase tracking-tight">Safety: {property.safety}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="mt-4 flex justify-end">
-                        <button
-                          onClick={() => navigate("/property-detail")}
-                          className="w-fit bg-primary text-white font-bold text-xs px-4 py-2 rounded-lg shadow-lg shadow-primary/20 hover:bg-emerald-600 transition-colors uppercase tracking-tight"
-                        >
-                          View Details
-                        </button>
+                        <div className="mt-4 flex justify-end">
+                          <button
+                            onClick={() => navigate("/property-detail")}
+                            className="w-fit bg-primary text-white font-bold text-xs px-4 py-2 rounded-lg shadow-lg shadow-primary/20 hover:bg-emerald-600 transition-colors uppercase tracking-tight"
+                          >
+                            View Details
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}
