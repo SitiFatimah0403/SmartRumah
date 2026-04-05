@@ -725,7 +725,26 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
 
             <button
               type="button"
-              onClick={() => navigate("/profile")}
+              onClick={async () => {
+                const payload = {
+                  uid: "test-user-123", // ⚠️ TEMP UID (for testing)
+                  ...formData,
+                };
+
+                const res = await fetch("http://localhost:5000/users/update-profile", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(payload),
+                });
+
+                const data = await res.json();
+
+                console.log("SAVED:", data);
+
+                navigate("/profile");
+              }}
               className="flex w-full items-center justify-center gap-2 rounded-3xl bg-emerald-500 px-6 py-4 text-lg font-extrabold text-white shadow-[0_10px_30px_rgba(16,185,129,0.28)] transition hover:brightness-110 active:scale-[0.98]"
             >
               <span>Done</span>
