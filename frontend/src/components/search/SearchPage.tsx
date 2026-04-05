@@ -434,7 +434,7 @@ export default function SearchPage() {
                         </div>
                         <div className="mt-4 flex justify-end">
                           <button
-                            onClick={() => navigate("/property-detail")}
+                            onClick={() => navigate(`/property/${property.Property_ID}`)}
                             className="w-fit bg-primary text-white font-bold text-xs px-4 py-2 rounded-lg shadow-lg shadow-primary/20 hover:bg-emerald-600 transition-colors uppercase tracking-tight"
                           >
                             View Details

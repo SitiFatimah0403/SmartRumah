@@ -28,7 +28,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/13wgDqGgcIz2zyfKjCtrLHjAx974XYZF9"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390033/P01_wsikoh.jpg"
   },
   {
     "Property_ID": "P02",
@@ -59,7 +59,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1h1S_KSJ-8vmhr26Ad0WCyD53etDXJCrJ"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390033/P02_ramuef.jpg"
   },
   {
     "Property_ID": "P03",
@@ -90,7 +90,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1noootqcyyVeuMmMwkCLFgE5voc0J9rV6"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390033/P03_ajopak.jpg"
   },
   {
     "Property_ID": "P04",
@@ -121,7 +121,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1AE5HZyHKw8DTCAJ_OjO-npmwis21Ex3r"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390034/P04_dc1ymh.jpg"
   },
   {
     "Property_ID": "P05",
@@ -152,7 +152,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1deVU5CpyQzGqueg3xuTZjRgFjwxQoXsv"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390033/P05_lbmuow.jpg"
   },
   {
     "Property_ID": "P06",
@@ -183,7 +183,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1laURMeRZfFavJ0CAhjk84gone6zLI7-0"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390038/P06_ktkv63.jpg"
   },
   {
     "Property_ID": "P07",
@@ -214,7 +214,7 @@
     "Swimming_Pool": "No",
     "Gym": "No",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/165j0ULWJTSyuCTO7Cb7_hRwwdMomP0qU"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390039/P07_ohxlue.jpg"
   },
   {
     "Property_ID": "P08",
@@ -245,7 +245,7 @@
     "Swimming_Pool": "No",
     "Gym": "No",
     "Playground": "No",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1IerVMhOi9UShb5JosXbQkeZVB6wGgeYx"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390041/P08_k4pmfs.jpg"
   },
   {
     "Property_ID": "P09",
@@ -276,7 +276,7 @@
     "Swimming_Pool": "No",
     "Gym": "No",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1qkfZvQBkcORTCLV6ePgS-jlHNIg4PqYu"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390035/P09_is4q0h.jpg"
   },
   {
     "Property_ID": "P10",
@@ -307,7 +307,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "No",
     "Playground": "No",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1jN6KnWXVMLksRMRqgOtOCYEok4aP4Eqv"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390052/P10_ju35iy.jpg"
   },
   {
     "Property_ID": "P11",
@@ -338,7 +338,7 @@
     "Swimming_Pool": "No",
     "Gym": "No",
     "Playground": "No",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1Uf8ajNn-N4A3dtO-emKRiEgdcLcooq5N"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390057/P11_olzk7c.png"
   },
   {
     "Property_ID": "P12",
@@ -369,7 +369,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "No",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1bth7ljaV7V1gCaAcvVyocLPwhpYx5_V2"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390054/P12_tte9wn.jpg"
   },
   {
     "Property_ID": "P13",
@@ -400,7 +400,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1H6eX3xyPSkTWODPYejXletfvgegroujl"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390048/P13_kb3vxj.jpg"
   },
   {
     "Property_ID": "P14",
@@ -431,7 +431,7 @@
     "Swimming_Pool": "No",
     "Gym": "No",
     "Playground": "No",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1u3TQBviMj7FAvhDbHuojZaB81HT-NfoV"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390290/P14_v8vqzv.jpg"
   },
   {
     "Property_ID": "P15",
@@ -462,7 +462,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "No",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1Nm-ztDBmJuElAEh7WIhLZgaANUOiWEcu"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390310/P15_cao5sw.jpg"
   },
   {
     "Property_ID": "P16",
@@ -493,7 +493,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1DyS4EULxy3h2ioQ8IY7vwi1SW1LyYOf5"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390292/P16_fdoeiy.png"
   },
   {
     "Property_ID": "P17",
@@ -524,7 +524,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/12PiYKwqVL_V4KDimu9Nc8rJvSNBzkgH6"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390286/P17_uxtsk7.jpg"
   },
   {
     "Property_ID": "P18",
@@ -555,7 +555,7 @@
     "Swimming_Pool": "Yes",
     "Gym": "Yes",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/1lxuRSJD4M1WupxbdKFftJu6jGXm1Sa7-"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390292/P18_ltptx3.jpg"
   },
   {
     "Property_ID": "P19",
@@ -586,7 +586,7 @@
     "Swimming_Pool": "No",
     "Gym": "No",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/16qpuZ8x-y-k__-61iRth2hM3xsg74di-"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390287/P19_qlzqfh.jpg"
   },
   {
     "Property_ID": "P20",
@@ -617,6 +617,6 @@
     "Swimming_Pool": "No",
     "Gym": "No",
     "Playground": "Yes",
-    "propertyImage":"https://lh3.googleusercontent.com/d/19vwO-vzfYy4chxTjssHC84Zi9pwRZdkd"
+    "propertyImage":"https://res.cloudinary.com/deicukqwu/image/upload/v1775390287/P20_ymutpc.jpg"
   }
 ]
