@@ -1,6 +1,6 @@
 const { calculateTrueMonthlyCost } = require("./service");
 
-const calculateTrueCost = (req, res) => {
+const calculateTrueCost = async (req, res) => {
   try {
     const { propertyId, userProfile } = req.body || {};
 
@@ -12,7 +12,7 @@ const calculateTrueCost = (req, res) => {
     }
 
     // Call the math logic from the service file
-    const result = calculateTrueMonthlyCost({ propertyId, userProfile });
+    const result = await calculateTrueMonthlyCost({ propertyId, userProfile });
     return res.json(result);
     
   } catch (err) {
