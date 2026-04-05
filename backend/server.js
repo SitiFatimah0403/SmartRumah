@@ -11,6 +11,7 @@ const mapRoutes = require("./src/map/routes");
 const recommendationRoutes = require("./src/recommendation/routes");
 const propertyRoutes = require("./src/houses/property.routes");
 const riskRoutes = require("./src/riskDetection/risk.routes");
+const costCalculatorRoutes = require("./src/costCalculator/routes");
 
 
 app.use(cors())
@@ -24,6 +25,7 @@ app.use("/users", userRoutes);
 app.use("/recommendations", recommendationRoutes);
 app.use("/properties", propertyRoutes);
 app.use("/api", riskRoutes);
+app.use("/api", costCalculatorRoutes);
 
 
 app.get("/", (req,res)=>{
