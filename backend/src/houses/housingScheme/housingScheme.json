@@ -17,7 +17,7 @@
     "Median_PSF":433.33,
     "Lat":3.12391594,
     "Lng":101.6803363,
-    "Near_MRT":"Yes",
+    "Near_MRT":"Yes", 
     "Near_LRT":"Yes",
     "Near_Bus":"Yes",
     "Distance_MRT_km":0.8,

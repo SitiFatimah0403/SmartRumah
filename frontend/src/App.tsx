@@ -30,7 +30,7 @@ function App() {
       <Route path="/profile/edit/property-preferences" element={<PropertyPreferencesPage />} />
       <Route path="/profile/edit/scheme-eligibility" element={<SchemeEligibilityPage />} />
       <Route path="/profile/edit/scheme-interest" element={<SchemeInterestPage />} />
-      <Route path="/property-detail" element={<PropertyDetail />} />
+      <Route path="/property/:id" element={<PropertyDetail />} />
       <Route path="/all-properties" element={<AllProperty />} />
       <Route path="/housing-schemes" element={<HousingScheme />} />
       <Route path="/all-housing-schemes" element={<AllHousingScheme />} />

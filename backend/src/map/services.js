@@ -35,25 +35,21 @@ function getPropertyLocationById(id) {
 
   if (!property) return null;
 
-
   const lat = Number(property.Lat);
   const lng = Number(property.Lng);
+
+  // For validation
+  if (!lat || !lng) return null;
 
   return {
     id: property.Property_ID,
     name: property.Property_Name,
-
-    lat: lat,
-    lng: lng,
-
+    lat,
+    lng,
     address: `${property.Township}, ${property.Area}, ${property.State}`,
-
-  
-    coordinates:
-      lat && lng
-        ? `${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E`
-        : "Coordinates unavailable"
+    coordinates: `${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E`
   };
+
 }
 
 

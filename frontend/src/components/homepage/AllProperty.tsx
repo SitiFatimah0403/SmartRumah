@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AllProperty() {
@@ -15,32 +15,45 @@ export default function AllProperty() {
     { id: "townhouse", label: "Townhouse" },
   ];
 
-  const properties = [
-    {
-      id: 1,
-      name: "Residensi Melawati",
-      price: "RM 380,000",
-      match: "92%",
-      beds: 3,
-      baths: 2,
-      sqft: "950 sqft",
-      feature: "Zero Flood Risk",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuA4Mc3K6s8UnF-86gJnidljSd8Lyc6Zr3duqclTs3QRZCZkfB2tryrmQq5AVPbznRsOiDqjbUHoOVRbNFSP_t7XINvj2ZPAFN5woL1mGTDFgIrvW2TobflWi1wmJ6GajzBRGJx56GRNpPVPpb3UxVLx6zKzr97Bri0MRk_1bE-UzHF6yG9dnafADyDx3N6mvSBMZbYLvD2WdH4QS5OVAn8DD5bmP_CN0SQkrLzaDpjFj30HkEwR9gP7JuHEbInAOM6aopknQWjpL9o",
-    },
-    {
-      id: 2,
-      name: "Taman Melawati Terraces",
-      price: "RM 520,000",
-      match: "88%",
-      beds: 4,
-      baths: 3,
-      sqft: "1,400 sqft",
-      feature: "Zero Flood Risk",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuCjOyW2650PpFu4rsaDbdNkRlCbDUEFxxPfD5pqqLcSfBjSZU0C8Sq_naL6_TaC6NDnw2e4w_K9lO1ISPCNPAKiYDdr75Vc3aOj39jwp7_4CFq-HFQWkQbC-Q8WS-pubbb6Er7FGvGa873qZNTSwYKWmAzz3KWYrHj_Ww68SzjJQBI7XHZdc9uiwkVylgUCK_hmfnxcO3aX8Hy6IBFMBDmSslKe95cvYHrgi7QvTf0tHbzX2hWWur-7pL6gbqT_2h_iQC_BMNyH3wc",
-    },
-  ];
+  const [properties, setProperties] = useState<any[]>([]);
+
+  useEffect(() => {
+  async function fetchData() {
+    try {
+      //nanti ni ubah
+      const user = {
+        employmentDetails: {
+          workplaceLat: 3.1319,
+          workplaceLng: 101.6841,
+        },
+        propertyPreferences: {
+          maxBudget: 500000,
+        },
+      };
+
+      const res = await fetch("http://localhost:5000/recommendations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      const data = await res.json();
+
+    //ONLY REGULAR HOUSES
+    const regularOnly = data.filter(
+      (p: any) => p.propertyType === "regular"
+    );
+
+    setProperties(regularOnly);
+        } catch (err) {
+          console.error(err);
+        }
+  }
+
+  fetchData();
+}, []);
 
   const toggleFavorite = (id: number) => {
     setFavorites((prev) =>
@@ -103,16 +116,16 @@ export default function AllProperty() {
         <main className="flex-1 p-4 space-y-6 pb-24">
           {properties.map((property) => (
             <button
-              key={property.id}
-              onClick={() => navigate("/property-detail")}
+              key={property.Property_ID}
+              onClick={() => navigate(`/property/${property.Property_ID}`)}
               className="flex flex-col rounded-xl overflow-hidden bg-surface-dark shadow-xl shadow-black/5 border border-slate-800 transition-transform active:scale-[0.98] hover:shadow-2xl hover:shadow-black/20 hover:border-primary/30 text-left w-full"
             >
               <div
                 className="relative w-full aspect-[16/10] bg-center bg-no-repeat bg-cover"
-                style={{ backgroundImage: `url("${property.image}")` }}
+                style={{ backgroundImage: `url("${property.propertyImage}")` }}
               >
-                <div className="absolute top-3 left-3 bg-primary text-white text-[11px] font-bold px-2 py-1 rounded-md shadow-lg uppercase tracking-wider">
-                  {property.match} Match
+                <div className="absolute top-3 left-3 bg-primary text-white text-[15px] font-bold px-2 py-1 rounded-md shadow-lg uppercase tracking-wider">
+                  {property.matchScore}% Match
                 </div>
                 <button
                   onClick={(e) => {
@@ -132,23 +145,29 @@ export default function AllProperty() {
               </div>
 
               <div className="flex flex-col p-4 gap-2">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-white text-lg font-bold">{property.name}</h3>
-                  <p className="text-primary text-lg font-extrabold">{property.price}</p>
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="text-white font-bold text-lg">
+                    {property.Property_Name}
+                  </h4>
                 </div>
+
+                {/* Price */}
+                <p className="text-primary font-extrabold text-2xl mb-3">
+                  RM {property.Median_Price?.toLocaleString()}
+                </p>
 
                 <div className="flex items-center gap-4 text-slate-400 text-sm mb-4 border-b border-slate-800 pb-4">
                   <div className="flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-lg">bed</span>
-                    <span>{property.beds} Bed</span>
+                    <span>{property.Bedroom}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-lg">bathtub</span>
-                    <span>{property.baths} Bath</span>
+                    <span>{property.Toilet}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-lg">square_foot</span>
-                    <span>{property.sqft}</span>
+                    <span>{property.Floor_Area_sqft}</span>
                   </div>
                 </div>
 
