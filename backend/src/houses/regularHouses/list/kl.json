@@ -28,7 +28,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1zPvSaSGZIDO3oWFneOXH0qnExRQi2FHp"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402650/KL01_vliih7.jpg"
   },
   {
     "Property_ID":"KL02",
@@ -59,7 +59,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1cPrbIY4vTDFN0-9smy92gJ6yZuxo4Fmj"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402647/KL02_lsrorl.jpg"
   },
   {
     "Property_ID":"KL03",
@@ -90,7 +90,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1ClGVJ8ROt-QWOFvT6oehtDsLeh7bkaJT"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402648/KL03_mdlcps.jpg"
   },
   {
     "Property_ID":"KL04",
@@ -121,7 +121,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1LIF9inwycFX8Slcpu_7qWLwurIjZjSDu"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402649/KL04_tqnbfd.jpg"
   },
   {
     "Property_ID":"KL05",
@@ -152,7 +152,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1keoVePReosZdM7WMkB0hzr_RfxCKjvYM"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402647/KL05_bowpeb.jpg"
   },
   {
     "Property_ID":"KL06",
@@ -183,7 +183,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1yBm9fZILDQQP7OGlkZs3naJTrUB5Xu3h"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402650/KL06_qmkxto.jpg"
   },
   {
     "Property_ID":"KL07",
@@ -214,7 +214,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/18DbQBwVotwcw_nFewHVYwC-NlzygxCDB"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402648/KL07_luw0qf.jpg"
   },
   {
     "Property_ID":"KL08",
@@ -245,7 +245,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/19o3uv9IVAbEw49-WVPK8-UKDPWUSJ7ts"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402648/KL08_ndlp4k.jpg"
   },
   {
     "Property_ID":"KL09",
@@ -276,7 +276,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1ZCeGYhtoUinN993aR7cLyYVIIHBXwdv_"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402648/KL09_qdzbb1.jpg"
   },
   {
     "Property_ID":"KL10",
@@ -307,7 +307,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1ulaZZOxzgpBsCw20o2hssfeMcJe52Ole"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402649/KL10_xhje1v.jpg"
   },
   {
     "Property_ID":"KL11",
@@ -338,7 +338,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1j237KtPL0yvWrL4ZliNxRQcZkqxYkPJe"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402649/KL11_vcjmit.jpg"
   },
   {
     "Property_ID":"KL12",
@@ -369,7 +369,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1SMRMmj7cFUMcSzgfu0n0ZEOqYFCWM4-6"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402651/KL12_s15bqi.jpg"
   },
   {
     "Property_ID":"KL13",
@@ -400,7 +400,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/18vPkAngaawc9nBSGJo7HSPt3aPoaWavQ"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402651/KL13_iihlhy.jpg"
   },
   {
     "Property_ID":"KL14",
@@ -431,7 +431,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"No",
     "Playground":"No",
-    "propertyImage": "https://lh3.googleusercontent.com/d/11pZjKIUkILIxUvuXR-qbceauarsGmFKV"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402651/KL14_lno4id.jpg"
   },
   {
     "Property_ID":"KL15",
@@ -462,7 +462,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"No",
     "Playground":"No",
-    "propertyImage": "https://lh3.googleusercontent.com/d/18rEDw15SQL017MdmpV3sL-Wf6EC0XKzW"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402651/KL15_rljf1c.jpg"
   },
   {
     "Property_ID":"KL16",
@@ -493,7 +493,7 @@
     "Swimming_Pool":"No",
     "Gym":"No",
     "Playground":"No",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1_JPAhfarYDkaeKTYpOZgFAmk5-DFdhK-"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402651/KL16_eorc5k.jpg"
   },
   {
     "Property_ID":"KL17",
@@ -524,7 +524,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1JZ6yl1Dgc5XjUuYRied1mWcbYcJuFwOx"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402651/KL17_sawgi9.jpg"
   },
   {
     "Property_ID":"KL18",
@@ -555,7 +555,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"No",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/19h9BHnS9lYrNHwNhQ5jTtpttqnWvqSc6"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402649/KL18_sojj8m.jpg"
   },
   {
     "Property_ID":"KL19",
@@ -586,7 +586,7 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1TzYZ28v_YgR1_AYutp6_MebL6vXK9C8h"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402649/KL19_bayt08.jpg"
   },
   {
     "Property_ID":"KL20",
@@ -617,6 +617,6 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "propertyImage": "https://lh3.googleusercontent.com/d/1ZSRgwkQ5gIfLL3_u6EvDrOa90xEJaU-X"
+    "propertyImage": "https://res.cloudinary.com/deicukqwu/image/upload/v1775402649/KL20_tgsgzd.jpg"
   }
 ]
