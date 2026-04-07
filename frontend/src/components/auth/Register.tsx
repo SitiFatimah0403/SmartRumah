@@ -77,6 +77,7 @@ export default function SmartRumahCombinedPage() {
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeSearchControllerRef = useRef<AbortController | null>(null);
   const searchCacheRef = useRef<Map<string, { displayName: string; lat: number; lng: number }>>(new Map());
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -119,33 +120,41 @@ export default function SmartRumahCombinedPage() {
     selectedSchemes: ["prima", "selangorku"] as SchemeKey[],
   });
 
-  const handleChange = <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
+  const handleChange = <K extends keyof typeof formData>(
+    field: K,
+    value: (typeof formData)[K],
+    markTouched = true
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+    if (markTouched) {
+      setTouchedFields((prev) => {
+        const next = new Set(prev);
+        next.add(String(field));
+        return next;
+      });
+    }
   };
 
   useEffect(() => {
     if (!formData.applyingJointly && formData.incomeBasis !== "husband-only") {
-      handleChange("incomeBasis", "husband-only");
+      handleChange("incomeBasis", "husband-only", false);
     }
   }, [formData.applyingJointly, formData.incomeBasis]);
 
 
   const togglePriority = (label: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      priorities: prev.priorities.includes(label)
-        ? prev.priorities.filter((item) => item !== label)
-        : [...prev.priorities, label],
-    }));
+    const nextPriorities = formData.priorities.includes(label)
+      ? formData.priorities.filter((item) => item !== label)
+      : [...formData.priorities, label];
+    handleChange("priorities", nextPriorities);
   };
 
   const toggleScheme = (scheme: SchemeKey) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedSchemes: prev.selectedSchemes.includes(scheme)
-        ? prev.selectedSchemes.filter((item) => item !== scheme)
-        : [...prev.selectedSchemes, scheme],
-    }));
+    const nextSchemes = formData.selectedSchemes.includes(scheme)
+      ? formData.selectedSchemes.filter((item) => item !== scheme)
+      : [...formData.selectedSchemes, scheme];
+    handleChange("selectedSchemes", nextSchemes);
   };
 
   const husbandMonthlyIncome = Number(formData.householdIncome || 0);
@@ -342,21 +351,63 @@ function handleSearch(value: string) {
   );
 
   const toggleAllSchemes = () => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedSchemes: allSchemesSelected ? [] : schemeOptions.map((item) => item.key),
-    }));
+    handleChange(
+      "selectedSchemes",
+      allSchemesSelected ? [] : schemeOptions.map((item) => item.key)
+    );
   };
 
   const completedSections = useMemo(() => {
-    let score = 0;
-    if (formData.fullName && formData.email && formData.nric) score += 1;
-    if (formData.employmentStatus && formData.jobSector) score += 1;
-    if (formData.preferredState && formData.maxBudget) score += 1;
-    if (formData.householdIncome && formData.financingStatus) score += 1;
-    if (formData.selectedSchemes.length > 0) score += 1;
-    return score;
-  }, [formData]);
+    const isTouched = (field: keyof typeof formData) => touchedFields.has(String(field));
+    const hasText = (value: string) => value.trim().length > 0;
+
+    const section1Done =
+      isTouched("fullName") && hasText(formData.fullName) &&
+      isTouched("nric") && hasText(formData.nric) &&
+      isTouched("email") && hasText(formData.email) &&
+      isTouched("age") && hasText(formData.age) &&
+      isTouched("password") && hasText(formData.password) &&
+      isTouched("confirmPassword") && hasText(formData.confirmPassword) &&
+      formData.password.length >= 6 &&
+      formData.password === formData.confirmPassword &&
+      isTouched("citizenship") && hasText(formData.citizenship) &&
+      isTouched("maritalStatus") && hasText(formData.maritalStatus) &&
+      isTouched("race") && hasText(formData.race) &&
+      (formData.race !== "Others" || (isTouched("otherRace") && hasText(formData.otherRace)));
+
+    const section2Done =
+      isTouched("employmentStatus") && hasText(formData.employmentStatus) &&
+      isTouched("jobSector") && hasText(formData.jobSector) &&
+      isTouched("yearsOfEmployment") && formData.yearsOfEmployment >= 0 &&
+      isTouched("workplaceLocation") && hasText(formData.workplaceLocation) &&
+      isTouched("workplaceLat") && formData.workplaceLat !== null &&
+      isTouched("workplaceLng") && formData.workplaceLng !== null;
+
+    const section3Done =
+      isTouched("preferredState") && hasText(formData.preferredState) &&
+      isTouched("maxBudget") && formData.maxBudget > 0 &&
+      isTouched("commuteRange") && hasText(formData.commuteRange) &&
+      isTouched("priorities") && formData.priorities.length > 0 &&
+      isTouched("interestRate") && hasText(formData.interestRate) &&
+      isTouched("loanTenure") && hasText(formData.loanTenure) &&
+      isTouched("downpayment") && hasText(formData.downpayment);
+
+    const section4Done =
+      isTouched("firstTimeHomebuyer") &&
+      isTouched("householdIncome") && hasText(formData.householdIncome) &&
+      isTouched("dependents") && formData.dependents >= 0 &&
+      isTouched("householdSize") && hasText(formData.householdSize) &&
+      isTouched("ownResidentialProperty") && hasText(formData.ownResidentialProperty) &&
+      isTouched("applyingJointly") &&
+      (!formData.applyingJointly || isTouched("incomeBasis")) &&
+      (!shouldShowSpouseIncomeInput || (isTouched("spouseIncome") && hasText(formData.spouseIncome))) &&
+      isTouched("currentResidentialState") && hasText(formData.currentResidentialState) &&
+      isTouched("financingStatus") && hasText(formData.financingStatus);
+
+    const section5Done = isTouched("selectedSchemes") && formData.selectedSchemes.length > 0;
+
+    return [section1Done, section2Done, section3Done, section4Done, section5Done].filter(Boolean).length;
+  }, [formData, touchedFields, shouldShowSpouseIncomeInput]);
 
   const sectionTitleClass =
     "mb-1 text-xs font-bold uppercase tracking-[0.2em] text-emerald-500";

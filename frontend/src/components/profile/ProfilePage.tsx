@@ -12,10 +12,8 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
 
   const personalInfo = profile?.personalInfo || {};
-  const employmentDetails = profile?.employmentDetails || {};
   const propertyPreferences = profile?.propertyPreferences || {};
   const eligibility = profile?.eligibility || {};
-  const schemeInterest = profile?.schemeInterest || {};
 
   const formatValue = (value: any) => {
     if (value === undefined || value === null || value === "") {
@@ -218,55 +216,6 @@ export default function ProfilePage() {
             <div className="bg-card-dark p-4 rounded-2xl text-center shadow-md border border-slate-800">
               <span className="block text-xl font-bold text-white">RM {formatValue(propertyPreferences.maxBudget)}</span>
               <span className="text-[10px] text-slate-500 uppercase tracking-wider">Budget</span>
-            </div>
-          </section>
-
-          <section className="px-6 space-y-4 mb-8">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest px-2">
-              Your Registration Details
-            </h3>
-
-            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
-              <p className="text-sm font-bold text-white">Personal Information</p>
-              <p className="text-xs text-slate-300">NRIC: {formatValue(personalInfo.nric)}</p>
-              <p className="text-xs text-slate-300">Email: {formatValue(personalInfo.email)}</p>
-              <p className="text-xs text-slate-300">Citizenship: {formatValue(personalInfo.citizenship)}</p>
-              <p className="text-xs text-slate-300">Race: {formatValue(personalInfo.race)}</p>
-              <p className="text-xs text-slate-300">Marital Status: {formatValue(personalInfo.maritalStatus)}</p>
-            </div>
-
-            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
-              <p className="text-sm font-bold text-white">Employment Details</p>
-              <p className="text-xs text-slate-300">Status: {formatValue(employmentDetails.employmentStatus)}</p>
-              <p className="text-xs text-slate-300">Sector: {formatValue(employmentDetails.jobSector)}</p>
-              <p className="text-xs text-slate-300">Years: {formatValue(employmentDetails.yearsOfEmployment)}</p>
-              <p className="text-xs text-slate-300">Workplace: {formatValue(employmentDetails.workplaceLocation)}</p>
-            </div>
-
-            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
-              <p className="text-sm font-bold text-white">Housing Preferences</p>
-              <p className="text-xs text-slate-300">Preferred State: {formatValue(propertyPreferences.preferredState)}</p>
-              <p className="text-xs text-slate-300">Commute Range: {formatValue(propertyPreferences.commuteRange)}</p>
-              <p className="text-xs text-slate-300">Priorities: {formatValue(propertyPreferences.priorities)}</p>
-              <p className="text-xs text-slate-300">Interest Rate: {formatValue(propertyPreferences?.financing?.interestRate)}</p>
-              <p className="text-xs text-slate-300">Loan Tenure: {formatValue(propertyPreferences?.financing?.loanTenure)}</p>
-              <p className="text-xs text-slate-300">Downpayment: {formatValue(propertyPreferences?.financing?.downpayment)}</p>
-            </div>
-
-            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
-              <p className="text-sm font-bold text-white">Scheme Eligibility</p>
-              <p className="text-xs text-slate-300">First-time Buyer: {formatValue(eligibility.firstTimeHomebuyer)}</p>
-              <p className="text-xs text-slate-300">Dependents: {formatValue(eligibility.dependents)}</p>
-              <p className="text-xs text-slate-300">Household Size: {formatValue(eligibility.householdSize)}</p>
-              <p className="text-xs text-slate-300">Own Property: {formatValue(eligibility.ownResidentialProperty)}</p>
-              <p className="text-xs text-slate-300">Applying Jointly: {formatValue(eligibility.applyingJointly)}</p>
-              <p className="text-xs text-slate-300">Spouse Income: {formatValue(eligibility.spouseIncome)}</p>
-              <p className="text-xs text-slate-300">Financing Status: {formatValue(eligibility.financingStatus)}</p>
-            </div>
-
-            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
-              <p className="text-sm font-bold text-white">Scheme Interest</p>
-              <p className="text-xs text-slate-300">Selected Schemes: {formatValue(schemeInterest.selectedSchemes)}</p>
             </div>
           </section>
 
