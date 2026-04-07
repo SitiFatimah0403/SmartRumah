@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const BATCH_SIZE = 5;
 
 export default function SearchPage() {
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ export default function SearchPage() {
     "Bangsar South Bungalow",
   ]);
   const [savedItems, setSavedItems] = useState<number[]>([]);
-  const [sortType, setSortType] = useState<"none" | "low" | "high">("none");;
+  const [sortType, setSortType] = useState<"none" | "low" | "high">("none");
 
   const categories = [
     { id: "all", label: "All Homes", icon: "grid_view" },
@@ -24,14 +26,20 @@ export default function SearchPage() {
   const [properties, setProperties] = useState<any[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
   const [selectedType, setSelectedType] = useState("All");
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+  const [riskByPropertyId, setRiskByPropertyId] = useState<Record<string, { flood: string; landslide: string; safety: string }>>({});
+  const requestedRiskRef = useRef<Set<string>>(new Set());
+  const viewedPropertyIdsRef = useRef<Set<string>>(new Set());
+  const riskQueueRef = useRef<string[]>([]);
+  const isRiskQueueProcessingRef = useRef(false);
+  const cardObserverRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const mainRef = useRef<HTMLElement | null>(null);
 
   const toggleSort = () => {
     const newType = sortType === "low" ? "high" : "low";
 
     setSortType(newType);
-
-    const sorted = sortProperties(filteredProperties, newType);
-    setFilteredProperties(sorted);
   };
 
   const featuredAreas = [
@@ -108,32 +116,6 @@ const handleAreaClick = (areaName: string) => {
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
     setHasSearched(true);
-
-    const query = searchQuery.trim().toLowerCase();
-
-    const mainTypes = [
-      "apartment",
-      "condominium",
-      "semi d"
-    ];
-
-    const filtered = properties.filter((p) => {
-      const matchSearch =
-        p.Township?.toLowerCase().includes(query) ||
-        p.State?.toLowerCase().includes(query) ||
-        p.Property_Name?.toLowerCase().includes(query);
-
-      const matchCategory =
-        category === "all"
-          ? true
-          : category === "other"
-            ? !mainTypes.includes(p.Property_Type?.toLowerCase())
-            : p.Property_Type?.toLowerCase().includes(category.toLowerCase());
-
-      return matchSearch && matchCategory;
-    });
-
-    setFilteredProperties(filtered);
   };
   const sortProperties = (data: any[], type: string) => {
     return [...data].sort((a, b) => {
@@ -146,30 +128,6 @@ const handleAreaClick = (areaName: string) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setHasSearched(true);
-
-    const query = searchQuery.trim().toLowerCase();
-
-    let filtered = properties.filter((p) => {
-      const matchSearch =
-        p.Township?.toLowerCase().includes(query) ||
-        p.State?.toLowerCase().includes(query) ||
-        p.Property_Type?.toLowerCase().includes(query) ||
-        p.Property_Name?.toLowerCase().includes(query) ||
-        p.Area?.toLowerCase().includes(query);
-
-      const matchCategory =
-        selectedCategory === "all" ||
-        p.Property_Type?.toLowerCase() === selectedCategory;
-
-      return matchSearch && matchCategory;
-    });
-
-    // ✅ APPLY SORT AFTER FILTER
-    if (sortType !== "none") {
-      filtered = sortProperties(filtered, sortType);
-    }
-
-    setFilteredProperties(filtered);
   };
 
   const clearSearch = () => {
@@ -181,66 +139,205 @@ const handleAreaClick = (areaName: string) => {
   };
 
   useEffect(() => {
-    const fetchPropertiesWithRisk = async () => {
+    const fetchProperties = async () => {
       try {
         const res = await fetch("http://localhost:5000/houses");
         const data = await res.json();
 
-        // 🔥 attach risk to each property
-        const enriched = await Promise.all(
-          data.map(async (p: any) => {
-            try {
-              const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ propertyId: p.Property_ID }),
-              });
-
-              const risk = await riskRes.json();
-
-              return {
-                ...p,
-                flood: risk.floodRisk,
-                landslide: risk.landslideRisk,
-                safety: risk.safetyIndex,
-              };
-            } catch (err) {
-              console.error("Risk error:", err);
-              return p;
-            }
-          })
-        );
-
-        console.log("WITH RISK:", enriched);
-
-        setProperties(enriched);
+        setProperties(Array.isArray(data) ? data : []);
 
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchPropertiesWithRisk();
+    fetchProperties();
     }, []);
 
-   useEffect(() => {
-  if (!properties || properties.length === 0) return;
+  useEffect(() => {
+    if (!hasSearched) {
+      return;
+    }
 
-  const query = searchQuery.toLowerCase();
+    const query = searchQuery.trim().toLowerCase();
+    const category = selectedCategory.toLowerCase();
+    const mainTypes = ["apartment", "condominium", "semi d"];
 
-  const filtered = properties.filter((p) => {
-    return (
-      p.Township?.toLowerCase().includes(query) ||
-      p.State?.toLowerCase().includes(query) ||
-      p.Area?.toLowerCase().includes(query)
+    let filtered = properties.filter((p) => {
+      const propertyType = String(p.Property_Type || "").toLowerCase();
+      const matchSearch =
+        String(p.Township || "").toLowerCase().includes(query) ||
+        String(p.State || "").toLowerCase().includes(query) ||
+        String(p.Property_Type || "").toLowerCase().includes(query) ||
+        String(p.Property_Name || "").toLowerCase().includes(query) ||
+        String(p.Area || "").toLowerCase().includes(query);
+
+      const matchCategory =
+        category === "all"
+          ? true
+          : category === "other"
+            ? !mainTypes.includes(propertyType)
+            : propertyType.includes(category);
+
+      return matchSearch && matchCategory;
+    });
+
+    if (sortType !== "none") {
+      filtered = sortProperties(filtered, sortType);
+    }
+
+    setFilteredProperties(filtered);
+    setVisibleCount(BATCH_SIZE);
+  }, [hasSearched, properties, searchQuery, selectedCategory, sortType]);
+
+  const visibleProperties = useMemo(
+    () => filteredProperties.slice(0, visibleCount),
+    [filteredProperties, visibleCount]
+  );
+
+  const fetchRiskForProperty = useCallback(async (id: string) => {
+    try {
+      const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ propertyId: id }),
+      });
+
+      const risk = await riskRes.json();
+
+      setRiskByPropertyId((prev) => ({
+        ...prev,
+        [id]: {
+          flood: String(risk?.floodRisk ?? "Unknown"),
+          landslide: String(risk?.landslideRisk ?? "Unknown"),
+          safety: String(risk?.safetyIndex ?? "Unknown"),
+        },
+      }));
+    } catch (err) {
+      console.error("Risk error:", err);
+      setRiskByPropertyId((prev) => ({
+        ...prev,
+        [id]: {
+          flood: "Unknown",
+          landslide: "Unknown",
+          safety: "Unknown",
+        },
+      }));
+    }
+  }, []);
+
+  const processRiskQueue = useCallback(async () => {
+    if (isRiskQueueProcessingRef.current) {
+      return;
+    }
+
+    isRiskQueueProcessingRef.current = true;
+
+    try {
+      while (riskQueueRef.current.length > 0) {
+        const nextId = riskQueueRef.current.shift();
+
+        if (!nextId) {
+          continue;
+        }
+
+        await fetchRiskForProperty(nextId);
+      }
+    } finally {
+      isRiskQueueProcessingRef.current = false;
+    }
+  }, [fetchRiskForProperty]);
+
+  const enqueueRiskFetch = useCallback((propertyId: string) => {
+    if (!propertyId || requestedRiskRef.current.has(propertyId)) {
+      return;
+    }
+
+    requestedRiskRef.current.add(propertyId);
+    riskQueueRef.current.push(propertyId);
+    void processRiskQueue();
+  }, [processRiskQueue]);
+
+  useEffect(() => {
+    if (!hasSearched) {
+      return;
+    }
+
+    if (cardObserverRef.current) {
+      cardObserverRef.current.disconnect();
+    }
+
+    cardObserverRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          const propertyId = (entry.target as HTMLElement).dataset.propertyId;
+
+          if (!propertyId || viewedPropertyIdsRef.current.has(propertyId)) {
+            return;
+          }
+
+          viewedPropertyIdsRef.current.add(propertyId);
+          enqueueRiskFetch(propertyId);
+        });
+      },
+      {
+        root: mainRef.current,
+        threshold: 0.35,
+      }
     );
-  });
 
-  setFilteredProperties(filtered);
+    return () => {
+      cardObserverRef.current?.disconnect();
+    };
+  }, [hasSearched, enqueueRiskFetch]);
 
-}, [properties]); // 🔥 bila properties update
+  useEffect(() => {
+    if (!cardObserverRef.current || !hasSearched) {
+      return;
+    }
+
+    const observer = cardObserverRef.current;
+    const cardElements = Array.from(
+      document.querySelectorAll("[data-property-id]")
+    );
+
+    cardElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      cardElements.forEach((el) => observer.unobserve(el));
+    };
+  }, [hasSearched, visibleProperties]);
+
+  useEffect(() => {
+    if (!hasSearched || !sentinelRef.current || filteredProperties.length <= visibleCount) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, filteredProperties.length));
+        }
+      },
+      {
+        root: mainRef.current,
+        threshold: 0.2,
+      }
+    );
+
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasSearched, filteredProperties.length, visibleCount]);
     
 
   return (
@@ -302,7 +399,7 @@ const handleAreaClick = (areaName: string) => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 space-y-8 py-6">
+        <main ref={mainRef as React.RefObject<HTMLElement>} className="flex-1 overflow-y-auto px-4 space-y-8 py-6">
           {!hasSearched ? (
             <>
               <section>
@@ -420,11 +517,12 @@ const handleAreaClick = (areaName: string) => {
               </div>
 
               <div className="space-y-6">
-                {filteredProperties.map((property) => {
-                  console.log("Image URL:", property.propertyImage); //utk debug image problem
+                {visibleProperties.map((property) => {
+                  const propertyRisk = riskByPropertyId[property.Property_ID];
                   return (
                     <div
                       key={property.Property_ID}
+                      data-property-id={property.Property_ID}
                       className="group relative bg-card-dark rounded-2xl overflow-hidden border border-slate-800 shadow-sm hover:shadow-md transition-all"
                     >
                       <div className="relative h-56 w-full">
@@ -481,15 +579,15 @@ const handleAreaClick = (areaName: string) => {
                             <div className="flex-1 space-y-2 border-l border-slate-800 pl-4">
                               <div className="flex items-center gap-2 text-primary">
                                 <span className="material-symbols-outlined text-base">water_drop</span>
-                                <span className="text-[10px] font-bold uppercase tracking-tight">Flood: {property.flood}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-tight">Flood: {propertyRisk?.flood || "Loading..."}</span>
                               </div>
                               <div className="flex items-center gap-2 text-primary">
                                 <span className="material-symbols-outlined text-base">terrain</span>
-                                <span className="text-[10px] font-bold uppercase tracking-tight">Landslide: {property.landslide}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-tight">Landslide: {propertyRisk?.landslide || "Loading..."}</span>
                               </div>
                               <div className="flex items-center gap-2 text-primary">
                                 <span className="material-symbols-outlined text-base">shield</span>
-                                <span className="text-[10px] font-bold uppercase tracking-tight">Safety: {property.safety}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-tight">Safety: {propertyRisk?.safety || "Loading..."}</span>
                               </div>
                             </div>
                           </div>
@@ -508,6 +606,11 @@ const handleAreaClick = (areaName: string) => {
                     </div>
                   );
                 })}
+                {filteredProperties.length > visibleCount && (
+                  <div ref={sentinelRef} className="py-4 text-center text-xs text-slate-500">
+                    Loading more properties...
+                  </div>
+                )}
               </div>
             </>
           )}
