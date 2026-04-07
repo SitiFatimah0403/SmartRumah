@@ -1,5 +1,11 @@
 import React, { useMemo, useState } from "react";
 import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../../firebase";
+
+import {
   ArrowLeft,
   ArrowRight,
   Briefcase,
@@ -172,18 +178,93 @@ function handleSearch(value: string) {
 
   const handleSubmit = async () => {
   try {
-    const userId = "testUser123"; // temporary
+    if (!formData.email || !formData.password) {
+      alert("Email and password are required.");
+      return;
+    }
 
-    const res = await fetch("http://localhost:5000/users/profile", {
+    if (formData.password.length < 6) {
+      alert("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Password and confirm password do not match.");
+      return;
+    }
+
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      formData.email,
+      formData.password
+    );
+
+    if (formData.fullName) {
+      await updateProfile(userCredential.user, { displayName: formData.fullName });
+    }
+
+    const token = await userCredential.user.getIdToken();
+    localStorage.setItem("token", token);
+
+    const uid = userCredential.user.uid;
+
+    const res = await fetch("http://localhost:5000/users/update-profile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId,
-        formData, // THIS sends workplaceLat & workplaceLng
+        uid,
+        personalInfo: {
+          fullName: formData.fullName,
+          nric: formData.nric,
+          email: formData.email,
+          age: formData.age,
+          citizenship: formData.citizenship,
+          race: formData.race,
+          maritalStatus: formData.maritalStatus,
+        },
+        employmentDetails: {
+          employmentStatus: formData.employmentStatus,
+          jobSector: formData.jobSector,
+          yearsOfEmployment: formData.yearsOfEmployment,
+          workplaceLocation: formData.workplaceLocation,
+          workplaceLat: formData.workplaceLat,
+          workplaceLng: formData.workplaceLng,
+        },
+        propertyPreferences: {
+          preferredState: formData.preferredState,
+          maxBudget: formData.maxBudget,
+          commuteRange: formData.commuteRange,
+          priorities: formData.priorities,
+          financing: {
+            interestRate: formData.interestRate,
+            loanTenure: formData.loanTenure,
+            downpayment: formData.downpayment,
+          },
+        },
+        eligibility: {
+          firstTimeHomebuyer: formData.firstTimeHomebuyer,
+          householdIncome: formData.householdIncome,
+          dependents: formData.dependents,
+          householdSize: formData.householdSize,
+          ownResidentialProperty: formData.ownResidentialProperty,
+          applyingJointly: formData.applyingJointly,
+          spouseIncome: formData.spouseIncome,
+          currentResidentialState: formData.currentResidentialState,
+          financingStatus: formData.financingStatus,
+        },
+        schemeInterest: {
+          selectedSchemes: formData.selectedSchemes,
+        },
+        createdAt: new Date().toISOString(),
       }),
     });
+
+    if (!res.ok) {
+      const errorBody = await res.text();
+      throw new Error(`Failed to save profile: ${errorBody}`);
+    }
 
     const data = await res.json();
     console.log("Saved:", data);

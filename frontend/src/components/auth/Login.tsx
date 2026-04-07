@@ -52,6 +52,7 @@ export default function SmartRumahCombined() {
       const result = await signInWithPopup(auth, googleProvider);
 
       const token = await result.user.getIdToken();
+      localStorage.setItem("token", token);
 
       const res = await fetch("http://localhost:5000/auth/me", {
         method: "GET",
