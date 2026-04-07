@@ -29,7 +29,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const token = localStorage.getItem("token");
+      let token = localStorage.getItem("token");
+
+      if (!token && auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
+        localStorage.setItem("token", token);
+      }
 
       if (!token) {
         navigate("/login");
@@ -37,7 +42,7 @@ export default function ProfilePage() {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/users/me", {
+        let res = await fetch("http://localhost:5000/users/me", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -45,9 +50,23 @@ export default function ProfilePage() {
         });
 
         if (res.status === 401) {
-          localStorage.removeItem("token");
-          navigate("/login");
-          return;
+          if (auth.currentUser) {
+            const refreshedToken = await auth.currentUser.getIdToken(true);
+            localStorage.setItem("token", refreshedToken);
+
+            res = await fetch("http://localhost:5000/users/me", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${refreshedToken}`,
+              },
+            });
+          }
+
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            navigate("/login");
+            return;
+          }
         }
 
         if (res.status === 404) {
