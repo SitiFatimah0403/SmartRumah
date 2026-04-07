@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getSavedProperties, setSavedProperties } from "../../utils/savedProperties";
 
 const BATCH_SIZE = 5;
 
@@ -13,7 +14,7 @@ export default function SearchPage() {
     "Cyberjaya Semi-D",
     "Bangsar South Bungalow",
   ]);
-  const [savedItems, setSavedItems] = useState<number[]>([]);
+  const [savedItems, setSavedItems] = useState<string[]>([]);
   const [sortType, setSortType] = useState<"none" | "low" | "high">("none");
 
   const categories = [
@@ -85,7 +86,7 @@ export default function SearchPage() {
   };
 
  const toggleSaved = (property: any) => {
-  let saved = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+  const saved = getSavedProperties();
 
   const exists = saved.find(
     (item: any) => item.Property_ID === property.Property_ID
@@ -101,9 +102,9 @@ export default function SearchPage() {
     updated = [...saved, property]; // 💥 SAVE FULL OBJECT
   }
 
-  localStorage.setItem("savedProperties", JSON.stringify(updated));
+  setSavedProperties(updated);
 
-  setSavedItems(updated.map((p: any) => p.Property_ID)); // keep UI in sync
+  setSavedItems(updated.map((p: any) => String(p.Property_ID))); // keep UI in sync
 
   console.log("UPDATED SAVED:", updated);
 };
@@ -137,6 +138,11 @@ const handleAreaClick = (areaName: string) => {
   const removeRecentSearch = (search: string) => {
     setRecentSearches(recentSearches.filter((s) => s !== search));
   };
+
+  useEffect(() => {
+    const saved = getSavedProperties();
+    setSavedItems(saved.map((p: any) => String(p.Property_ID)));
+  }, []);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -538,7 +544,7 @@ const handleAreaClick = (areaName: string) => {
 
                             className="bg-slate-900/80 backdrop-blur p-2 rounded-full text-slate-100 shadow-sm hover:bg-slate-800 transition-colors"
                           >
-                            <span className={`material-symbols-outlined text-xl ${savedItems.includes(property.Property_ID) ? "fill-1 text-primary" : ""}`}>
+                            <span className={`material-symbols-outlined text-xl ${savedItems.includes(String(property.Property_ID)) ? "fill-1 text-primary" : ""}`}>
                               bookmark
                             </span>
                           </button>

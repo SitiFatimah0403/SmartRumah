@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getSavedProperties, setSavedProperties as persistSavedProperties } from "../../utils/savedProperties";
 
 export default function SavedPage() {
   const navigate = useNavigate();
@@ -23,11 +24,7 @@ export default function SavedPage() {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("savedProperties");
-
-    if (saved) {
-      setSavedProperties(JSON.parse(saved));
-    }
+    setSavedProperties(getSavedProperties());
   }, []);
 
   const fetchRiskForProperty = useCallback(async (id: string) => {
@@ -150,8 +147,8 @@ export default function SavedPage() {
 
     setSavedProperties(updated);
 
-    //update local storage
-    localStorage.setItem("savedProperties", JSON.stringify(updated));
+    // Persist under the current user-scoped key.
+    persistSavedProperties(updated);
   };
 
   return (
