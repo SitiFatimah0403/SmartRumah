@@ -15,25 +15,26 @@ import HousingScheme from "./components/homepage/HousingScheme";
 import AllHousingScheme from "./components/homepage/AllHousingScheme";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-      <Route path="/" element={<HomeDashboard />} />
-      <Route path="/search" element={<SearchPage />} />
-      <Route path="/saved" element={<SavedPage />} />
-      <Route path="/profile" element={<ProfilePage />} />
-      <Route path="/profile/edit" element={<ProfileEdit />} />
-      <Route path="/profile/edit/personal-information" element={<PersonalInformationPage />} />
-      <Route path="/profile/edit/employment-details" element={<EmploymentDetailsPage />} />
-      <Route path="/profile/edit/property-preferences" element={<PropertyPreferencesPage />} />
-      <Route path="/profile/edit/scheme-eligibility" element={<SchemeEligibilityPage />} />
-      <Route path="/profile/edit/scheme-interest" element={<SchemeInterestPage />} />
-      <Route path="/property/:id" element={<PropertyDetail />} />
-      <Route path="/all-properties" element={<AllProperty />} />
-      <Route path="/housing-schemes" element={<HousingScheme />} />
-      <Route path="/all-housing-schemes" element={<AllHousingScheme />} />
+      <Route path="/" element={<ProtectedRoute> <HomeDashboard /> </ProtectedRoute>} />
+      <Route path="/search" element={<ProtectedRoute> <SearchPage /> </ProtectedRoute>} />
+      <Route path="/saved" element={<ProtectedRoute> <SavedPage /> </ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute> <ProfilePage /> </ProtectedRoute>} />
+      <Route path="/profile/edit" element={<ProtectedRoute> <ProfileEdit /> </ProtectedRoute>} />
+      <Route path="/profile/edit/personal-information" element={<ProtectedRoute> <PersonalInformationPage /> </ProtectedRoute>} />
+      <Route path="/profile/edit/employment-details" element={<ProtectedRoute> <EmploymentDetailsPage /> </ProtectedRoute>} />
+      <Route path="/profile/edit/property-preferences" element={<ProtectedRoute> <PropertyPreferencesPage /> </ProtectedRoute>} />
+      <Route path="/profile/edit/scheme-eligibility" element={<ProtectedRoute> <SchemeEligibilityPage /> </ProtectedRoute>} />
+      <Route path="/profile/edit/scheme-interest" element={<ProtectedRoute> <SchemeInterestPage /> </ProtectedRoute>} />
+      <Route path="/property/:id" element={<ProtectedRoute><PropertyDetail /> </ProtectedRoute>} />
+      <Route path="/all-properties" element={<ProtectedRoute> <AllProperty /> </ProtectedRoute>} />
+      <Route path="/housing-schemes" element={<ProtectedRoute> <HousingScheme /> </ProtectedRoute>} />
+      <Route path="/all-housing-schemes" element={<ProtectedRoute> <AllHousingScheme /> </ProtectedRoute>} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
