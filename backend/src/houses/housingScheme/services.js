@@ -2,33 +2,44 @@
 const schemes = require("./data");
 const housingProjects = require("./housingScheme.json");
 
-function getEligibleSchemes(user) {
-
   // Step 1 — Find eligible schemes
+  function getEligibleSchemes(user) {
   const eligibleSchemes = schemes.filter((scheme) => {
 
-    if (scheme.minAge && user.age < scheme.minAge) return false;
-    if (scheme.incomeMin && user.income < scheme.incomeMin) return false;
-    if (scheme.incomeMax && user.income > scheme.incomeMax) return false;
-    if (scheme.locations && !scheme.locations.includes(user.location)) return false;
-    if (scheme.firstHomeRequired && !user.firstHomeBuyer) return false;
+    if (scheme.minAge && user.personalInfo.age < scheme.minAge) return false;
+    if (scheme.incomeMin && user.eligibility.householdIncome < scheme.incomeMin) return false;
+    if (scheme.incomeMax && user.eligibility.householdIncome > scheme.incomeMax) return false;
+    if (scheme.locations && !scheme.locations.includes(user.propertyPreferences.preferredState)) return false;
+    if (scheme.firstHomeRequired && !user.eligibility.firstTimeHomebuyer) return false;
 
     return true;
-
   });
 
-  // Step 2 — Find projects under those schemes
-  const matchingProjects = housingProjects.filter(project => {
+  // Step 2 - Get nearest houses for each scheme
+  function getDistance(p, userLat, userLng) {
+  const dx = p.Lat - userLat;
+  const dy = p.Lng - userLng;
+  return Math.sqrt(dx * dx + dy * dy);
+}
 
-    const schemeMatch = eligibleSchemes.some(
-      scheme => scheme.name === project.scheme
-    );
+  // Step 3 — Find projects under those schemes
+  const userLat = user.employmentDetails.workplaceLat;
+  const userLng = user.employmentDetails.workplaceLng;
 
-    const locationMatch = project.State === user.location;
+  const matchingProjects = housingProjects
+    .filter(project => {
+      const schemeMatch = eligibleSchemes.some(
+        scheme => scheme.name === project.Housing_Scheme
+      );
 
-    return schemeMatch && locationMatch;
-
-  });
+      return schemeMatch;
+    })
+    .map(project => ({
+      ...project,
+      distance: getDistance(project, userLat, userLng)
+    }))
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 20);
 
   return {
     eligibleSchemes,

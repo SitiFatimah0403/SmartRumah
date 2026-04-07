@@ -54,31 +54,36 @@ export default function HousingScheme() {
     try {
       //nanti ni ubah
       const user = {
-        employmentDetails: {
-          workplaceLat: 3.1319,
-          workplaceLng: 101.6841,
-        },
-        propertyPreferences: {
-          maxBudget: 500000,
-        },
-      };
+      personalInfo: {
+        age: 25,
+      },
+      employmentDetails: {
+        workplaceLat: 3.1319,
+        workplaceLng: 101.6841,
+      },
+      propertyPreferences: {
+        preferredState: "Kuala Lumpur",
+        maxBudget: 500000,
+      },
+      eligibility: {
+        householdIncome: 5000,
+        firstTimeHomebuyer: true,
+      },
+    };
 
-      const res = await fetch("http://localhost:5000/recommendations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
+      const res = await fetch("http://localhost:5000/housing-schemes/eligible", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
 
       const data = await res.json();
 
-      // ONLY SCHEME
-      const schemeOnly = data.filter(
-        (p: any) => p.propertyType === "scheme"
-      );
-
-      setProperties(schemeOnly);
+     
+      console.log("API RESPONSE:", data); 
+      setProperties(data.matchingProjects);
 
     } catch (err) {
       console.error(err);
