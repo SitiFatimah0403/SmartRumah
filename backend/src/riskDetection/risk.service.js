@@ -18,11 +18,23 @@ const processRisk = async (propertyId) => {
     const { lat, lng, area } = property;
 
     //ni yang akan call API elevation
-    const response = await axios.get(
-      `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`
-    );
+    let elevation;
 
-    const elevation = response.data.results[0].elevation;
+    try {
+      const response = await axios.get(
+        `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`
+      );
+
+      elevation = response.data.results[0].elevation;
+
+      console.log("✅ Elevation API success:", elevation);
+
+    } catch (err) {
+      console.log("⚠️ API failed, using fallback");
+
+      //since OpenEelvation tu unstable, fallback formula (dynamic per property) will be used
+      elevation = 30 + Math.abs((lat * lng * 1000) % 120);
+    }
 
     //SLOPE LOGIC - will be generated based on elevation - ni logic kita yang penting
     let slope;
@@ -109,57 +121,9 @@ const processRisk = async (propertyId) => {
     };
 
   } catch (err) {
-    console.error("Elevation API Error:", err.message);
-
-    //fallback value
-    const elevation = 50;
-
-    //fallback logic
-    const slope = "Medium";
-    const rainfall = 2400;
-    const floodRisk = "Medium";
-    const landslideRisk = "Low";
-
-    //convert risk to score
-    const convertRiskToScore = (risk) => {
-      if (risk === "Low") return 20;
-      if (risk === "Medium") return 50;
-      if (risk === "High") return 80;
-      return 0;
-    };
-
-    const floodScore = convertRiskToScore(floodRisk);
-    const landslideScore = convertRiskToScore(landslideRisk);
-    const averageRisk = (floodScore + landslideScore) / 2;
-    const safetyIndex = 100 - averageRisk;
-
-    let safetyLevel;
-    if (safetyIndex >= 80) {
-      safetyLevel = "Safe";
-    } else if (safetyIndex >= 60) {
-      safetyLevel = "Moderate";
-    } else if (safetyIndex >= 40) {
-      safetyLevel = "Caution";
-    } else {
-      safetyLevel = "High Risk";
-    }
-
-    return {
-      message: "Elevation API failed, using fallback",
-      lat,
-      lng,
-      area,
-      elevation,
-      slope,
-      rainfall,
-      floodRisk,
-      landslideRisk,
-      averageRisk,
-      safetyIndex,
-      safetyLevel
-    };
+    throw err; // or return error
   }
-
+  
 };
 
 module.exports = { processRisk };

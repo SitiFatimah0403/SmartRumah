@@ -172,14 +172,49 @@ export default function SearchPage() {
     setRecentSearches(recentSearches.filter((s) => s !== search));
   };
 
-  useEffect(() => {
-    fetch("http://localhost:5000/houses")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("DATA:", data); // DEBUG
-        setProperties(data);
-      })
-      .catch((err) => console.error(err));
+useEffect(() => {
+  const fetchPropertiesWithRisk = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/houses");
+      const data = await res.json();
+
+      // 🔥 attach risk to each property
+      const enriched = await Promise.all(
+        data.map(async (p: any) => {
+          try {
+            const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ propertyId: p.Property_ID }),
+            });
+
+            const risk = await riskRes.json();
+
+            return {
+              ...p,
+              flood: risk.floodRisk,
+              landslide: risk.landslideRisk,
+              safety: risk.safetyIndex,
+            };
+          } catch (err) {
+            console.error("Risk error:", err);
+            return p;
+          }
+        })
+      );
+
+      console.log("WITH RISK:", enriched);
+
+      setProperties(enriched);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchPropertiesWithRisk();
   }, []);
 
   return (
