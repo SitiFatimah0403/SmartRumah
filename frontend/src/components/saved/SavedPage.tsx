@@ -7,6 +7,14 @@ export default function SavedPage() {
   const [savedProperties, setSavedProperties] = useState<any[]>([]);
   const location = useLocation();
 
+  const handleBack = () => {
+    if (location.state?.from === "saved") {
+      navigate("/saved");
+    } else {
+      navigate(-1);
+    }
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem("savedProperties");
 
@@ -147,7 +155,7 @@ export default function SavedPage() {
                 <div className="mt-4 flex justify-end">
                           <button
                             onClick={() => navigate(`/property/${property.Property_ID}`, {
-                              state: { from: "search"}
+                              state: { from: "saved"}
                             })}
                             className="w-fit bg-primary text-white font-bold text-xs px-4 py-2 rounded-lg shadow-lg shadow-primary/20 hover:bg-emerald-600 transition-colors uppercase tracking-tight"
                           >
@@ -189,9 +197,27 @@ export default function SavedPage() {
               <span className="text-[10px] uppercase font-medium">Search</span>
             </button>
 
-            <button className="flex flex-col items-center gap-1 text-primary">
-              <span className="material-symbols-outlined text-[28px] fill-1">bookmark</span>
-              <span className="text-[10px] uppercase font-medium">Saved</span>
+            <button
+              onClick={() => navigate("/saved")}
+              className={`flex flex-col items-center gap-1 ${
+                location.pathname === "/saved" || location.pathname.startsWith("/property")
+                  ? "text-primary"
+                  : "text-slate-500"
+              }`}
+            >
+              <span
+                className={`material-symbols-outlined text-[28px] ${
+                  location.pathname === "/saved" || location.pathname.startsWith("/property")
+                    ? "fill-1"
+                    : ""
+                }`}
+              >
+                bookmark
+              </span>
+
+              <span className="text-[10px] uppercase font-medium">
+                Saved
+              </span>
             </button>
 
             <button
@@ -213,3 +239,5 @@ export default function SavedPage() {
     </div>
   );
 }
+
+console.log(location.pathname);
