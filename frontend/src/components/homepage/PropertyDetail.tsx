@@ -26,6 +26,7 @@ export default function PropertyDetail() {
   const [trueCost, setTrueCost] = useState<TrueCostData | null>(null);
   const [trueCostLoading, setTrueCostLoading] = useState(false);
   const [trueCostError, setTrueCostError] = useState("");
+  const [risk, setRisk] = useState<any>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -61,6 +62,20 @@ export default function PropertyDetail() {
         );
         const locationData = await locationRes.json();
         setLocation(locationData);
+        //fetch risk
+        const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ propertyId: id }),
+      });
+
+      const riskData = await riskRes.json();
+
+      console.log("RISK:", riskData);
+
+      setRisk(riskData);
 
         // Fetch true monthly cost from backend costCalculator API.
         setTrueCostLoading(true);
@@ -361,13 +376,23 @@ export default function PropertyDetail() {
             <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 flex flex-col gap-2">
               <span className="material-symbols-outlined text-primary">shield</span>
               <p className="text-slate-400 text-xs font-medium uppercase">Flood Risk</p>
-              <p className="text-white font-bold leading-tight">Low <br /><span className="text-[10px] font-normal text-slate-500">(No JPS Data)</span></p>
+              <p className="text-white font-bold leading-tight">
+                {risk?.floodRisk || "Loading..."}
+              </p>            
             </div>
-            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 flex flex-col gap-2">
-              <span className="material-symbols-outlined text-primary">verified_user</span>
-              <p className="text-slate-400 text-xs font-medium uppercase">Developer</p>
-              <p className="text-white font-bold leading-tight">Clean <br /><span className="text-[10px] font-normal text-slate-500">(KPKT Verified)</span></p>
-            </div>
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 flex flex-col gap-2">
+            <span className="material-symbols-outlined text-primary">landslide</span>
+            <p className="text-slate-400 text-xs font-medium uppercase">Landslide Risk</p>
+            <p className="text-white font-bold">
+              {risk?.landslideRisk || "Loading..."}
+            </p>
+          </div>
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 col-span-2">
+            <p className="text-slate-400 text-xs uppercase">Safety Index</p>
+            <p className="text-blue-400 font-bold">
+              {risk?.safetyIndex ? `${risk.safetyIndex}/100` : "Loading..."}
+            </p>
+          </div>
           </div>
         </section>
 

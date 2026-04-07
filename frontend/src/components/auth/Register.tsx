@@ -26,6 +26,8 @@ import {
   Wallet,
 } from "lucide-react";
 
+let timeout: any;
+
 const states = [
   "Kuala Lumpur",
   "Selangor",
@@ -45,7 +47,7 @@ const states = [
   "Labuan",
 ];
 
-type SchemeKey = "prima" | "selangorku" | "myhome" | "rumawip" | "spb";
+type SchemeKey = "prima" | "selangorku" | "rumawip" ;
 
 const schemeOptions: {
   key: SchemeKey;
@@ -55,9 +57,7 @@ const schemeOptions: {
 }[] = [
   { key: "prima", title: "PR1MA", subtitle: "Affordable Urban Living", icon: <BuildingIcon /> },
   { key: "selangorku", title: "Rumah Selangorku", subtitle: "Selangor State Housing", icon: <House className="h-7 w-7" /> },
-  { key: "myhome", title: "MyHome", subtitle: "Private Affordable Housing", icon: <Home className="h-7 w-7" /> },
   { key: "rumawip", title: "RUMAWIP", subtitle: "Federal Territory Residency", icon: <Landmark className="h-7 w-7" /> },
-  { key: "spb", title: "SPB", subtitle: "Youth Housing Scheme", icon: <Briefcase className="h-7 w-7" /> },
 ];
 
 export default function SmartRumahCombinedPage() {
@@ -86,7 +86,7 @@ export default function SmartRumahCombinedPage() {
     employmentStatus: "Employed",
     jobSector: "Private Sector",
     yearsOfEmployment: 5,
-    workplaceLocation: "KLCC, Kuala Lumpur",
+    workplaceLocation: "",
     workplaceLat: null as number | null,
     workplaceLng: null as number | null,
 
@@ -133,6 +133,42 @@ export default function SmartRumahCombinedPage() {
         : [...prev.selectedSchemes, scheme],
     }));
   };
+
+  async function searchLocation(query: string) {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=my&limit=1`,
+        {
+          headers: {
+            "Accept": "application/json",
+            "User-Agent": "SmartRumahApp/1.0"
+          }
+        }
+      );
+
+      const data = await res.json();
+      console.log("RESULT:", data);
+
+      if (data.length > 0) {
+        const place = data[0];
+
+        handleChange("workplaceLat", parseFloat(place.lat));
+        handleChange("workplaceLng", parseFloat(place.lon));
+        handleChange("workplaceLocation", place.display_name);
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+function handleSearch(value: string) {
+  clearTimeout(timeout);
+
+  timeout = setTimeout(() => {
+    searchLocation(value);
+  }, 600);
+}
 
   const handleSubmit = async () => {
   try {
@@ -188,6 +224,8 @@ export default function SmartRumahCombinedPage() {
     "rounded-3xl border border-white/5 bg-slate-900/60 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.2)] backdrop-blur-xl";
   const inputClass =
     "h-14 w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 text-sm text-white outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 placeholder:text-slate-500";
+
+    
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -445,44 +483,60 @@ export default function SmartRumahCombinedPage() {
 
                 <Field label="Workplace Location" icon={<MapPin className="h-4 w-4" />}>
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />
-                    <input
-                      className={`${inputClass} pl-11`}
-                      value={formData.workplaceLocation}
-                      onChange={(e) => handleChange("workplaceLocation", e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.geolocation.getCurrentPosition((pos) => {
-                          handleChange("workplaceLat", pos.coords.latitude);
-                          handleChange("workplaceLng", pos.coords.longitude);
 
-                          handleChange(
-                            "workplaceLocation",
-                            "Current Location 📍"
-                          );
-                        });
-                      }}
-                      className="mt-3 w-full rounded-xl bg-emerald-500/10 py-2 text-sm font-semibold text-emerald-400 hover:bg-emerald-500/20"
-                    >
-                      Use My Current Location 📍
-                    </button>
-                  </div>
+                  {/*Search Icon */}
+                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-emerald-400" />
+
+                  {/* INPUT */}
+                  <input
+                    type="text"
+                    placeholder="Search area (e.g. Bangsar, KLCC)"
+                    value={formData.workplaceLocation}
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      // update text
+                      handleChange("workplaceLocation", value);
+
+                      // 🔥 RESET OLD LOCATION
+                      handleChange("workplaceLat", null);
+                      handleChange("workplaceLng", null);
+
+                      // 🔥 debounce search
+                      if (value.length > 3) {
+                        handleSearch(value);
+                      }
+                    }}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-xl py-4 pl-12 pr-4 text-white font-medium focus:outline-none focus:border-emerald-400"
+                  />
+
+                  {/* BUTTON */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.geolocation.getCurrentPosition((pos) => {
+                        handleChange("workplaceLat", pos.coords.latitude);
+                        handleChange("workplaceLng", pos.coords.longitude);
+                        handleChange("workplaceLocation", "Current Location 📍");
+                      });
+                    }}
+                    className="mt-3 w-full rounded-xl bg-emerald-500/10 py-2 text-sm font-semibold text-emerald-400 hover:bg-emerald-500/20"
+                  >
+                    Use My Current Location 📍
+                  </button>
+
+                </div>
                 </Field>
               </div>
 
-              <div className="mt-5 h-56 overflow-hidden rounded-3xl border border-white/5 bg-[radial-gradient(rgba(16,185,129,0.22)_1px,transparent_1px)] [background-size:20px_20px]">
-                <div className="relative flex h-full items-center justify-center bg-slate-950/40">
-                  <div className="absolute left-4 top-4 rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-950">
-                    Live preview
-                  </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <MapPin className="h-12 w-12 text-emerald-500 drop-shadow-[0_0_14px_rgba(16,185,129,0.6)]" />
-                    <p className="text-sm font-semibold text-slate-200">{formData.workplaceLocation}</p>
-                  </div>
-                </div>
-              </div>
+              {formData.workplaceLat && formData.workplaceLng && (
+                <iframe
+                  width="100%"
+                  height="220"
+                  style={{ borderRadius: "16px" }}
+                  src={`https://www.google.com/maps?q=${formData.workplaceLat},${formData.workplaceLng}&z=15&output=embed`}
+                />
+              )}
             </section>
 
             <section className={cardClass}>

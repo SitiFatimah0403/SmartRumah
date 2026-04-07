@@ -30,15 +30,22 @@ export default function HomeDashboard() {
     try {
       // ni hardcoded dullu sbb firestore belum siap, nanti kena adjust ikut data user sebenar
       const user = {
-        employmentDetails: {
-          workplaceLocation: "Bangsar", // optional
-          workplaceLat: 3.1319,   
-          workplaceLng: 101.6841  
-        },
-        propertyPreferences: {
-          maxBudget: 500000,
-        },
-      };
+      personalInfo: {
+        age: 25,
+      },
+      employmentDetails: {
+        workplaceLat: 3.1319,
+        workplaceLng: 101.6841,
+      },
+      propertyPreferences: {
+        preferredState: "Kuala Lumpur",
+        maxBudget: 500000,
+      },
+      eligibility: {
+        householdIncome: 5000,
+        firstTimeHomebuyer: true,
+      },
+    };
 
       //const user = firestoreUserData -> ni time firestore dh siap
 
