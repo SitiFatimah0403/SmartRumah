@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Home, BarChart3, ShieldCheck, Mail, Lock, Eye, LogIn } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../../firebase";
 
 export default function SmartRumahCombined() {
   const [showSplash, setShowSplash] = useState(true);
@@ -14,6 +16,59 @@ export default function SmartRumahCombined() {
     const timer = setTimeout(() => setShowSplash(false), 2200);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const token = await userCredential.user.getIdToken();
+      localStorage.setItem("token", token);
+
+      // send token to backend
+      const res = await fetch("http://localhost:5000/auth/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("User:", data);
+
+      navigate("/");
+
+    } catch (error: any) {
+      console.error("Login error:", error.message);
+      alert(error.message);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+
+      const token = await result.user.getIdToken();
+
+      const res = await fetch("http://localhost:5000/auth/me", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Google User:", data);
+
+      navigate("/");
+
+    } catch (error: any) {
+      console.error("Google login error:", error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#101622] text-white font-sans">
@@ -69,13 +124,12 @@ export default function SmartRumahCombined() {
                   {[0, 1, 2].map((i) => (
                     <motion.div
                       key={i}
-                      className={`h-2.5 w-2.5 rounded-full ${
-                        i === 0
-                          ? "bg-emerald-400"
-                          : i === 1
+                      className={`h-2.5 w-2.5 rounded-full ${i === 0
+                        ? "bg-emerald-400"
+                        : i === 1
                           ? "bg-emerald-400/60"
                           : "bg-emerald-400/30"
-                      }`}
+                        }`}
                       animate={{ opacity: [1, 0.45, 1], scale: [1, 0.92, 1] }}
                       transition={{
                         duration: 1.4,
@@ -192,7 +246,9 @@ export default function SmartRumahCombined() {
               </div>
 
               <div className="py-6">
-                <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 py-4 font-extrabold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600">
+                <button
+                  onClick={handleLogin}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 py-4 font-extrabold text-white shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-600">
                   <span>Log In</span>
                   <LogIn className="h-5 w-5" />
                 </button>
@@ -207,7 +263,9 @@ export default function SmartRumahCombined() {
               </div>
 
               <div className="pt-4">
-                <button className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white font-bold text-slate-800 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200 dark:hover:bg-slate-800/50">
+                <button
+                  onClick={handleGoogleLogin}
+                  className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white font-bold text-slate-800 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200 dark:hover:bg-slate-800/50">
                   <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
                     <path
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -234,11 +292,11 @@ export default function SmartRumahCombined() {
                 <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                   Don&apos;t have an account?
                   <button
-  onClick={() => navigate("/register")}
-  className="ml-1 font-extrabold text-emerald-500 hover:underline"
->
-  Sign up here
-</button>
+                    onClick={() => navigate("/register")}
+                    className="ml-1 font-extrabold text-emerald-500 hover:underline"
+                  >
+                    Sign up here
+                  </button>
                 </p>
               </div>
             </div>

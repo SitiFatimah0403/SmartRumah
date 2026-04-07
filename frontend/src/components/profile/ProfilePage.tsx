@@ -1,11 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [viewCount] = useState(128);
   const [collectionsCount] = useState(12);
   const [savedCount] = useState(45);
+
+  const handleLogout = async () => {
+    try {
+      // 1. Sign out from Firebase
+      await signOut(auth);
+
+      // 2. Remove token
+      localStorage.removeItem("token");
+
+      // 3. Redirect to login
+      navigate("/login");
+
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   const profileSetupItems = [
     {
@@ -167,9 +185,8 @@ export default function ProfilePage() {
               {accountSettings.map((setting, index) => (
                 <button
                   key={setting.id}
-                  className={`w-full flex items-center justify-between p-4 hover:bg-slate-700 transition-colors ${
-                    index < accountSettings.length - 1 ? "border-b border-slate-700" : ""
-                  }`}
+                  className={`w-full flex items-center justify-between p-4 hover:bg-slate-700 transition-colors ${index < accountSettings.length - 1 ? "border-b border-slate-700" : ""
+                    }`}
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-xl ${setting.bgColor} flex items-center justify-center ${setting.iconColor}`}>
@@ -184,7 +201,9 @@ export default function ProfilePage() {
           </section>
 
           <section className="px-6 mt-8">
-            <button className="w-full py-4 rounded-2xl bg-red-500/10 text-red-500 font-semibold flex items-center justify-center gap-2 hover:bg-red-500/20 transition-colors border border-red-500/20">
+            <button
+              onClick={handleLogout}
+              className="w-full py-4 rounded-2xl bg-red-500/10 text-red-500 font-semibold flex items-center justify-center gap-2 hover:bg-red-500/20 transition-colors border border-red-500/20">
               <span className="material-symbols-outlined">logout</span>
               Log Out
             </button>
