@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function SearchPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [hasSearched, setHasSearched] = useState(false);
   const [recentSearches, setRecentSearches] = useState([
     "Mont Kiara Condos",
@@ -23,6 +23,7 @@ export default function SearchPage() {
   ];
   const [properties, setProperties] = useState<any[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<any[]>([]);
+  const [selectedType, setSelectedType] = useState("All");
 
   const toggleSort = () => {
     const newType = sortType === "low" ? "high" : "low";
@@ -75,27 +76,34 @@ export default function SearchPage() {
       "https://lh3.googleusercontent.com/aida-public/AB6AXuCiIrTMumIXnLv7YAjxitshD5IZmHD2JjwIIBQc1lbO5o8M8YGSqjo7KFfElDWVa_gQEyqbaut7eRyQzQ8oTsHmxMo2wku4ohoKrI2ARCAXeXecOCTIFSGt5qQChQ1tdoGjeObQCgPGnJMk0nKpjLfn3zZEy8qUvQ8rJEtN1IjhtcjdGnXvJUsgIuMD8Qm3FTbs_n6aYF41UhP5oWJDVlmlciT8LHBvtURQrD0ZsOcb6qRiV_6R6K9DclzKdVSevdNUFXJ-MWV_E24",
   };
 
-  const toggleSaved = (id: number) => {
-    setSavedItems((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+ const toggleSaved = (property: any) => {
+  let saved = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+
+  const exists = saved.find(
+    (item: any) => item.Property_ID === property.Property_ID
+  );
+
+  let updated;
+
+  if (exists) {
+    updated = saved.filter(
+      (item: any) => item.Property_ID !== property.Property_ID
     );
-  };
+  } else {
+    updated = [...saved, property]; // 💥 SAVE FULL OBJECT
+  }
 
-  const handleAreaClick = (areaName: string) => {
-    setSearchQuery(areaName);     // fill search box
-    setHasSearched(true);         // switch to result view
+  localStorage.setItem("savedProperties", JSON.stringify(updated));
 
-    const query = areaName.toLowerCase();
+  setSavedItems(updated.map((p: any) => p.Property_ID)); // keep UI in sync
 
-    const filtered = properties.filter((p) => {
-      return (
-        p.Township?.toLowerCase().includes(query) ||
-        p.State?.toLowerCase().includes(query)
-      );
-    });
+  console.log("UPDATED SAVED:", updated);
+};
 
-    setFilteredProperties(filtered);
-  };
+const handleAreaClick = (areaName: string) => {
+  setSearchQuery(areaName);
+  setHasSearched(true);
+};
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(category);
@@ -172,50 +180,68 @@ export default function SearchPage() {
     setRecentSearches(recentSearches.filter((s) => s !== search));
   };
 
-useEffect(() => {
-  const fetchPropertiesWithRisk = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/houses");
-      const data = await res.json();
+  useEffect(() => {
+    const fetchPropertiesWithRisk = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/houses");
+        const data = await res.json();
 
-      // 🔥 attach risk to each property
-      const enriched = await Promise.all(
-        data.map(async (p: any) => {
-          try {
-            const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ propertyId: p.Property_ID }),
-            });
+        // 🔥 attach risk to each property
+        const enriched = await Promise.all(
+          data.map(async (p: any) => {
+            try {
+              const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ propertyId: p.Property_ID }),
+              });
 
-            const risk = await riskRes.json();
+              const risk = await riskRes.json();
 
-            return {
-              ...p,
-              flood: risk.floodRisk,
-              landslide: risk.landslideRisk,
-              safety: risk.safetyIndex,
-            };
-          } catch (err) {
-            console.error("Risk error:", err);
-            return p;
-          }
-        })
-      );
+              return {
+                ...p,
+                flood: risk.floodRisk,
+                landslide: risk.landslideRisk,
+                safety: risk.safetyIndex,
+              };
+            } catch (err) {
+              console.error("Risk error:", err);
+              return p;
+            }
+          })
+        );
 
-      console.log("WITH RISK:", enriched);
+        console.log("WITH RISK:", enriched);
 
-      setProperties(enriched);
+        setProperties(enriched);
 
-    } catch (err) {
-      console.error(err);
-    }
-  };
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  fetchPropertiesWithRisk();
-  }, []);
+    fetchPropertiesWithRisk();
+    }, []);
+
+   useEffect(() => {
+  if (!properties || properties.length === 0) return;
+
+  const query = searchQuery.toLowerCase();
+
+  const filtered = properties.filter((p) => {
+    return (
+      p.Township?.toLowerCase().includes(query) ||
+      p.State?.toLowerCase().includes(query) ||
+      p.Area?.toLowerCase().includes(query)
+    );
+  });
+
+  setFilteredProperties(filtered);
+
+}, [properties]); // 🔥 bila properties update
+    
 
   return (
     <div className="dark">
@@ -410,7 +436,8 @@ useEffect(() => {
                         />
                         <div className="absolute top-3 right-3 flex flex-col gap-2">
                           <button
-                            onClick={() => toggleSaved(property.Property_ID)}
+                            onClick={() => toggleSaved(property)}
+
                             className="bg-slate-900/80 backdrop-blur p-2 rounded-full text-slate-100 shadow-sm hover:bg-slate-800 transition-colors"
                           >
                             <span className={`material-symbols-outlined text-xl ${savedItems.includes(property.Property_ID) ? "fill-1 text-primary" : ""}`}>
@@ -469,7 +496,9 @@ useEffect(() => {
                         </div>
                         <div className="mt-4 flex justify-end">
                           <button
-                            onClick={() => navigate(`/property/${property.Property_ID}`)}
+                            onClick={() => navigate(`/property/${property.Property_ID}`, {
+                              state: { from: "search"}
+                            })}
                             className="w-fit bg-primary text-white font-bold text-xs px-4 py-2 rounded-lg shadow-lg shadow-primary/20 hover:bg-emerald-600 transition-colors uppercase tracking-tight"
                           >
                             View Details

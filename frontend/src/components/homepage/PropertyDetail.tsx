@@ -28,7 +28,45 @@ export default function PropertyDetail() {
   const [trueCostError, setTrueCostError] = useState("");
   const [risk, setRisk] = useState<any>(null);
 
+  const toggleSaved = () => {
+  let savedList = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+
+  const exists = savedList.find(
+    (item: any) => item.Property_ID === property.Property_ID
+  );
+
+  let updated;
+
+  if (exists) {
+    updated = savedList.filter(
+      (item: any) => item.Property_ID !== property.Property_ID
+    );
+    setIsSaved(false);
+  } else {
+    updated = [
+      ...savedList,
+      {
+        ...property,
+        flood: risk?.floodRisk,
+        landslide: risk?.landslideRisk,
+        safety: risk?.safetyIndex,
+      }
+    ];
+    setIsSaved(true);
+  }
+
+  localStorage.setItem("savedProperties", JSON.stringify(updated));
+
+  console.log("UPDATED FROM DETAIL:", updated);
+};
+  
+
+
   useEffect(() => {
+
+    const savedList = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+
+    
     async function fetchData() {
       try {
         // Fetch property details
@@ -56,6 +94,15 @@ export default function PropertyDetail() {
 
       setProperty(propertyData);
 
+      // 🔥 ADD THIS
+      const savedList = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+
+      const exists = savedList.find(
+        (item: any) => item.Property_ID === propertyData.Property_ID
+      );
+
+      setIsSaved(!!exists);
+
         // Fetch location (lat lng)
         const locationRes = await fetch(
           `http://localhost:5000/map/property/${id}`
@@ -70,6 +117,8 @@ export default function PropertyDetail() {
         },
         body: JSON.stringify({ propertyId: id }),
       });
+
+      setIsSaved(!!exists);
 
       const riskData = await riskRes.json();
 
@@ -542,7 +591,7 @@ export default function PropertyDetail() {
               Contact Verified Agent
             </button>
             <button
-              onClick={() => setIsSaved(!isSaved)}
+              onClick={toggleSaved}
               className="p-3.5 bg-slate-800/50 border border-slate-700 text-slate-300 rounded-xl flex items-center justify-center group active:scale-95 transition-transform hover:bg-slate-700/50"
             >
               <span className={`material-symbols-outlined fill-1 ${isSaved ? "text-primary" : ""}`}>bookmark</span>

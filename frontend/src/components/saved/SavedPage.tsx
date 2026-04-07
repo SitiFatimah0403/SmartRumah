@@ -1,59 +1,29 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SavedPage() {
   const navigate = useNavigate();
 
-  const [savedProperties, setSavedProperties] = useState([
-    {
-      id: 1,
-      name: "Mont Kiara Luxury Condo",
-      price: "RM 1,250,000",
-      location: "Jalan Kiara, Mont Kiara, Kuala Lumpur",
-      beds: 3,
-      baths: 2,
-      sqft: "1,250",
-      matchScore: "92%",
-      flood: "Low",
-      landslide: "Low",
-      safety: "92",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuAX7CI-ILFS8F48gXdFaooPUag73m_gl43c7-937apkt36pZPeGw3QaAQ5jMpxxRlrgcfuLkZSpnuuyB5oTo5SKLD27xUO2gTTji92ZZThjl5IfbBVvmozNMrBZrLlJ5PyMtbXjeQ4UxTkGQa2Ue7dqhmeza0NozqdB0shz2qRvqqyJd-8Cc3OSeuyEuOWOsl-OGKp31qJauPv2L4Jq5HuaWIMsgNkmjSk9PaM6Cpv5sFwgJc29zNQd99VRtYa896Gfw8LW1xDcWTM",
-    },
-    {
-      id: 2,
-      name: "Kiara 163 Serviced Suites",
-      price: "RM 980,000",
-      location: "Mont Kiara, KL",
-      beds: 2,
-      baths: 2,
-      sqft: "850",
-      matchScore: "92%",
-      flood: "Low",
-      landslide: "Low",
-      safety: "88",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuAwhEuDhMNtnketd9C097RqKDBFM-6O9pZvRxP9esONOjCHUdKhsFA8x3Ioc2e4bNMh7ppeCs2mXMFwy9dvCnYQXlsVbKZ0UCG3psAq5UkO5yORoaX_7gVDPNKT4HJwytEI_voZh-AuydJc38vd7dkEOwWn_V-XjD-QriXjJEld_q-J6ef7mZ3o5ol4xVYZIy0tZHS9n9AWHiu6Jnim2N2gom42nciGn5iFBWy6XQ2fUmweqxvIORqg6693Z4Ow6fkL9NOTjVxGcEs",
-    },
-    {
-      id: 3,
-      name: "Residensi 22 Penthouse",
-      price: "RM 2,450,000",
-      location: "North Kiara, Mont Kiara",
-      beds: 4,
-      baths: 4,
-      sqft: "2,900",
-      matchScore: "92%",
-      flood: "Low",
-      landslide: "Low",
-      safety: "95",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBbSLa8jy0FIbF2UpX35zeoUIxkeYEryxa3u-sEn7E-DP0ywoq8rdeAKnYIWeUkPnvjuGGJZJttwCxDJnD1fG2ltRT4BaXUbaSZBKRfY1ld-a9VfOpqFfCynxLd-vGV4x9tLG46Y_sv1gefq9IGEoDlqmfDlPlR0ltuMSkc6iWv1R5zqy1mKp7rbg_vY5ZIlDUcPvppTnsKhGexFKhR81TqMmLgp8Vs8yp4Yuce2QBVLkWN-nKUxTycLqmDRD77DhF-YDmwYna4Y2Y",
-    },
-  ]);
+  const [savedProperties, setSavedProperties] = useState<any[]>([]);
+  const location = useLocation();
 
-  const handleRemoveSaved = (id: number) => {
-    setSavedProperties((prev) => prev.filter((prop) => prop.id !== id));
+  useEffect(() => {
+    const saved = localStorage.getItem("savedProperties");
+
+    if (saved) {
+      setSavedProperties(JSON.parse(saved));
+    }
+  }, []);
+
+  const handleRemoveSaved = (id: string) => {
+    const updated = savedProperties.filter(
+      (prop) => prop.Property_ID !== id
+    );
+
+    setSavedProperties(updated);
+
+    //update local storage
+    localStorage.setItem("savedProperties", JSON.stringify(updated));
   };
 
   return (
@@ -81,8 +51,7 @@ export default function SavedPage() {
               <span className="text-primary font-semibold">{savedProperties.length}</span> properties saved
             </p>
             <button className="text-primary flex items-center gap-1 hover:text-primary/80 transition-colors">
-              <span>Sort By</span>
-              <span className="material-symbols-outlined text-sm">sort</span>
+              
             </button>
           </div>
         </header>
@@ -91,81 +60,104 @@ export default function SavedPage() {
           {savedProperties.length > 0 ? (
             savedProperties.map((property) => (
               <article
-                key={property.id}
+                key={property.Property_ID}
                 className="bg-card-dark rounded-3xl overflow-hidden border border-slate-800 shadow-lg hover:shadow-xl transition-shadow"
               >
                 <div className="relative h-56 w-full">
                   <img
-                    alt={property.name}
-                    src={property.image}
+                    alt={property.Property_Name
+}
+                    src={property.propertyImage || property.Property_Image || "/placeholder.jpg"}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-4 left-4 bg-primary/90 text-white text-[10px] font-bold px-3 py-1 rounded-full">
                     {property.matchScore} MATCH
                   </div>
                   <button
-                    onClick={() => handleRemoveSaved(property.id)}
+                    onClick={() => handleRemoveSaved(property.Property_ID)}
                     className="absolute top-4 right-4 bg-background-dark/60 p-2 rounded-full text-primary backdrop-blur-sm hover:bg-background-dark/80 transition-colors"
                     title="Remove from saved"
                   >
                     <span className="material-symbols-outlined text-lg fill-1">bookmark</span>
                   </button>
                   <div className="absolute bottom-4 left-4 bg-background-dark/80 backdrop-blur-md px-3 py-1 rounded-lg">
-                    <p className="text-white text-sm font-bold">{property.price}</p>
+                    <p className="text-white text-sm font-bold">RM {property.Median_Price?.toLocaleString()}</p>
                   </div>
                 </div>
 
                 <div className="p-5">
-                  <h2 className="text-white text-lg font-bold">{property.name}</h2>
+                  <h2 className="text-white text-lg font-bold">{property.Property_Name}</h2>
                   <div className="flex items-center gap-1 text-slate-400 text-xs mt-1 mb-4">
                     <span className="material-symbols-outlined text-xs text-primary">location_on</span>
-                    {property.location}
+                    {property.Area || property.Township || property.State}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-slate-400 text-xs">
+                  <div className="flex items-center justify-between border-t border-slate-800 pt-3">
+
+                  <div className="flex flex-1 gap-4">
+
+                    {/* LEFT */}
+                    <div className="flex-1 space-y-2">
+
+                      <div className="flex items-center gap-2 text-slate-400">
                         <span className="material-symbols-outlined text-base">bed</span>
-                        <span>{property.beds} Beds</span>
+                        <span className="text-sm font-semibold">{property.Bedroom} Beds</span>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-400 text-xs">
+
+                      <div className="flex items-center gap-2 text-slate-400">
                         <span className="material-symbols-outlined text-base">bathtub</span>
-                        <span>{property.baths} Baths</span>
+                        <span className="text-sm font-semibold">{property.Toilet} Baths</span>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-400 text-xs">
+
+                      <div className="flex items-center gap-2 text-slate-400">
                         <span className="material-symbols-outlined text-base">square_foot</span>
-                        <span>{property.sqft} sqft</span>
+                        <span className="text-sm font-semibold">{property.Floor_Area_sqft} sqft</span>
                       </div>
+
                     </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                        <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
+                    {/* RIGHT */}
+                    <div className="flex-1 space-y-2 border-l border-slate-800 pl-4">
+
+                      <div className="flex items-center gap-2 text-primary">
+                        <span className="material-symbols-outlined text-base">water_drop</span>
+                        <span className="text-[10px] font-bold uppercase">
                           Flood: {property.flood}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                        <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
+
+                      <div className="flex items-center gap-2 text-primary">
+                        <span className="material-symbols-outlined text-base">terrain</span>
+                        <span className="text-[10px] font-bold uppercase">
                           Landslide: {property.landslide}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary"></div>
-                        <span className="text-[10px] text-primary font-bold uppercase tracking-wider">
+
+                      <div className="flex items-center gap-2 text-primary">
+                        <span className="material-symbols-outlined text-base">shield</span>
+                        <span className="text-[10px] font-bold uppercase">
                           Safety: {property.safety}
                         </span>
                       </div>
-                      <button
-                        onClick={() => navigate("/property-detail")}
-                        className="w-full mt-2 bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-lg shadow-primary/20"
-                      >
-                        VIEW DETAILS
-                      </button>
+
                     </div>
+
                   </div>
                 </div>
+                <div className="mt-4 flex justify-end">
+                          <button
+                            onClick={() => navigate(`/property/${property.Property_ID}`, {
+                              state: { from: "search"}
+                            })}
+                            className="w-fit bg-primary text-white font-bold text-xs px-4 py-2 rounded-lg shadow-lg shadow-primary/20 hover:bg-emerald-600 transition-colors uppercase tracking-tight"
+                          >
+                            View Details
+                          </button>
+                        </div>
+                </div>
+
+                
+
               </article>
             ))
           ) : (
