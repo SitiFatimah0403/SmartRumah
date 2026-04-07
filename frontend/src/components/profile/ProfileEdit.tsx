@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -40,6 +40,8 @@ type FormData = {
   jobSector: string;
   yearsOfEmployment: number;
   workplaceLocation: string;
+  workplaceLat: number | null;
+  workplaceLng: number | null;
   preferredState: string;
   maxBudget: number;
   commuteRange: string;
@@ -49,6 +51,7 @@ type FormData = {
   downpayment: string;
   firstTimeHomebuyer: boolean;
   householdIncome: string;
+  incomeBasis: "husband-only" | "include-spouse";
   dependents: number;
   householdSize: string;
   ownResidentialProperty: string;
@@ -110,6 +113,10 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeSearchControllerRef = useRef<AbortController | null>(null);
+  const searchCacheRef = useRef<Map<string, { displayName: string; lat: number; lng: number }>>(new Map());
 
   const [formData, setFormData] = useState<FormData>({
     fullName: "Luqman Hakim",
@@ -126,6 +133,8 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
     jobSector: "Private Sector",
     yearsOfEmployment: 5,
     workplaceLocation: "KLCC, Kuala Lumpur",
+    workplaceLat: null,
+    workplaceLng: null,
     preferredState: "Kuala Lumpur",
     maxBudget: 450000,
     commuteRange: "10km",
@@ -135,6 +144,7 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
     downpayment: "10%",
     firstTimeHomebuyer: true,
     householdIncome: "5500",
+    incomeBasis: "husband-only",
     dependents: 2,
     householdSize: "3",
     ownResidentialProperty: "No",
@@ -144,6 +154,93 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
     financingStatus: "Not applied yet",
     selectedSchemes: ["prima", "selangorku"],
   });
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:5000/users/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          return;
+        }
+
+        const data = await res.json();
+        const profile = data?.profile;
+
+        if (!profile) {
+          return;
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          fullName: profile?.personalInfo?.fullName || prev.fullName,
+          nric: profile?.personalInfo?.nric || prev.nric,
+          email: profile?.personalInfo?.email || prev.email,
+          age: profile?.personalInfo?.age || prev.age,
+          citizenship: profile?.personalInfo?.citizenship || prev.citizenship,
+          race: profile?.personalInfo?.race || prev.race,
+          maritalStatus: profile?.personalInfo?.maritalStatus || prev.maritalStatus,
+
+          employmentStatus: profile?.employmentDetails?.employmentStatus || prev.employmentStatus,
+          jobSector: profile?.employmentDetails?.jobSector || prev.jobSector,
+          yearsOfEmployment:
+            profile?.employmentDetails?.yearsOfEmployment ?? prev.yearsOfEmployment,
+          workplaceLocation: profile?.employmentDetails?.workplaceLocation || prev.workplaceLocation,
+          workplaceLat: profile?.employmentDetails?.workplaceLat ?? prev.workplaceLat,
+          workplaceLng: profile?.employmentDetails?.workplaceLng ?? prev.workplaceLng,
+
+          preferredState: profile?.propertyPreferences?.preferredState || prev.preferredState,
+          maxBudget: profile?.propertyPreferences?.maxBudget ?? prev.maxBudget,
+          commuteRange: profile?.propertyPreferences?.commuteRange || prev.commuteRange,
+          priorities: profile?.propertyPreferences?.priorities || prev.priorities,
+          interestRate:
+            profile?.propertyPreferences?.financing?.interestRate || prev.interestRate,
+          loanTenure: profile?.propertyPreferences?.financing?.loanTenure || prev.loanTenure,
+          downpayment:
+            profile?.propertyPreferences?.financing?.downpayment || prev.downpayment,
+
+          firstTimeHomebuyer:
+            profile?.eligibility?.firstTimeHomebuyer ?? prev.firstTimeHomebuyer,
+          householdIncome:
+            profile?.eligibility?.husbandIncome || profile?.eligibility?.householdIncome || prev.householdIncome,
+          incomeBasis:
+            profile?.eligibility?.incomeBasis ||
+            (profile?.eligibility?.includeSpouseIncome ? "include-spouse" : "husband-only"),
+          dependents: profile?.eligibility?.dependents ?? prev.dependents,
+          householdSize: profile?.eligibility?.householdSize || prev.householdSize,
+          ownResidentialProperty:
+            profile?.eligibility?.ownResidentialProperty || prev.ownResidentialProperty,
+          applyingJointly: profile?.eligibility?.applyingJointly ?? prev.applyingJointly,
+          spouseIncome: profile?.eligibility?.spouseIncome || prev.spouseIncome,
+          currentResidentialState:
+            profile?.eligibility?.currentResidentialState || prev.currentResidentialState,
+          financingStatus: profile?.eligibility?.financingStatus || prev.financingStatus,
+
+          selectedSchemes: profile?.schemeInterest?.selectedSchemes || prev.selectedSchemes,
+        }));
+      } catch (error) {
+        console.error("Failed to load profile data:", error);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  useEffect(() => {
+    if (!formData.applyingJointly && formData.incomeBasis !== "husband-only") {
+      handleChange("incomeBasis", "husband-only");
+    }
+  }, [formData.applyingJointly, formData.incomeBasis]);
 
   const handleChange = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -178,6 +275,89 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
       selectedSchemes: allSchemesSelected ? [] : schemeOptions.map((s) => s.key),
     }));
   };
+
+  const husbandMonthlyIncome = Number(formData.householdIncome || 0);
+  const spouseMonthlyIncome =
+    formData.applyingJointly && formData.incomeBasis === "include-spouse"
+      ? Number(formData.spouseIncome || 0)
+      : 0;
+  const totalMonthlyHouseholdIncome = husbandMonthlyIncome + spouseMonthlyIncome;
+  const shouldShowSpouseIncomeInput =
+    formData.applyingJointly && formData.incomeBasis === "include-spouse";
+
+  async function searchLocation(query: string) {
+    const normalized = query.trim().toLowerCase();
+
+    if (!normalized || normalized.length < 2) {
+      return;
+    }
+
+    const cached = searchCacheRef.current.get(normalized);
+    if (cached) {
+      handleChange("workplaceLat", cached.lat);
+      handleChange("workplaceLng", cached.lng);
+      handleChange("workplaceLocation", cached.displayName);
+      return;
+    }
+
+    if (activeSearchControllerRef.current) {
+      activeSearchControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    activeSearchControllerRef.current = controller;
+    setIsSearchingLocation(true);
+
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=my&limit=1`,
+        {
+          signal: controller.signal,
+          headers: {
+            "Accept": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.length > 0) {
+        const place = data[0];
+        const lat = parseFloat(place.lat);
+        const lng = parseFloat(place.lon);
+
+        searchCacheRef.current.set(normalized, {
+          displayName: place.display_name,
+          lat,
+          lng,
+        });
+
+        handleChange("workplaceLat", lat);
+        handleChange("workplaceLng", lng);
+        handleChange("workplaceLocation", place.display_name);
+      }
+    } catch (err) {
+      if ((err as Error).name === "AbortError") {
+        return;
+      }
+      console.error(err);
+    } finally {
+      if (activeSearchControllerRef.current === controller) {
+        activeSearchControllerRef.current = null;
+      }
+      setIsSearchingLocation(false);
+    }
+  }
+
+  function handleWorkplaceSearch(value: string) {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      searchLocation(value);
+    }, 280);
+  }
 
   const sectionClass =
     "rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-[0_10px_30px_rgba(0,0,0,0.25)] backdrop-blur-xl";
@@ -388,23 +568,57 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
                     <input
                       className={`${inputClass} pl-11`}
                       value={formData.workplaceLocation}
-                      onChange={(e) => handleChange("workplaceLocation", e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        handleChange("workplaceLocation", value);
+                        handleChange("workplaceLat", null);
+                        handleChange("workplaceLng", null);
+
+                        if (value.length > 1) {
+                          handleWorkplaceSearch(value);
+                        }
+                      }}
                     />
                   </div>
+                  {isSearchingLocation && (
+                    <p className="mt-2 text-xs text-emerald-400">Searching location...</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.geolocation.getCurrentPosition((pos) => {
+                        handleChange("workplaceLat", pos.coords.latitude);
+                        handleChange("workplaceLng", pos.coords.longitude);
+                        handleChange("workplaceLocation", "Current Location");
+                      });
+                    }}
+                    className="mt-3 w-full rounded-xl bg-emerald-500/10 py-2 text-sm font-semibold text-emerald-400 hover:bg-emerald-500/20"
+                  >
+                    Use My Current Location
+                  </button>
                 </Field>
               </div>
 
-              <div className="mt-5 h-52 overflow-hidden rounded-3xl border border-white/5 bg-[radial-gradient(rgba(16,185,129,0.22)_1px,transparent_1px)] [background-size:20px_20px]">
-                <div className="relative flex h-full items-center justify-center bg-slate-950/50">
-                  <div className="absolute bottom-3 left-3 rounded-md bg-emerald-500 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-950">
-                    Live Preview
-                  </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <MapPin className="h-12 w-12 text-emerald-500 drop-shadow-[0_0_14px_rgba(16,185,129,0.65)]" />
-                    <p className="text-sm font-semibold">{formData.workplaceLocation}</p>
+              {formData.workplaceLat && formData.workplaceLng ? (
+                <iframe
+                  width="100%"
+                  height="220"
+                  style={{ borderRadius: "16px" }}
+                  src={`https://www.google.com/maps?q=${formData.workplaceLat},${formData.workplaceLng}&z=15&output=embed`}
+                />
+              ) : (
+                <div className="mt-5 h-52 overflow-hidden rounded-3xl border border-white/5 bg-[radial-gradient(rgba(16,185,129,0.22)_1px,transparent_1px)] [background-size:20px_20px]">
+                  <div className="relative flex h-full items-center justify-center bg-slate-950/50">
+                    <div className="absolute bottom-3 left-3 rounded-md bg-emerald-500 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-950">
+                      Live Preview
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <MapPin className="h-12 w-12 text-emerald-500 drop-shadow-[0_0_14px_rgba(16,185,129,0.65)]" />
+                      <p className="text-sm font-semibold">{formData.workplaceLocation}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </section>
             )}
 
@@ -514,7 +728,7 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
                     </button>
                   </Field>
 
-                  <Field label="Monthly Household Income (RM)" icon={<Wallet className="h-4 w-4" />}>
+                  <Field label="Husband Monthly Income (RM)" icon={<Wallet className="h-4 w-4" />}>
                     <input
                       className={inputClass}
                       value={formData.householdIncome}
@@ -576,7 +790,14 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
 
                   <Field label="Applying jointly with spouse?" icon={<Heart className="h-4 w-4" />}>
                     <div className="grid grid-cols-2 gap-3">
-                      <button type="button" onClick={() => handleChange("applyingJointly", false)} className={toggleButtonClass(!formData.applyingJointly)}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleChange("applyingJointly", false);
+                          handleChange("incomeBasis", "husband-only");
+                        }}
+                        className={toggleButtonClass(!formData.applyingJointly)}
+                      >
                         No
                       </button>
                       <button type="button" onClick={() => handleChange("applyingJointly", true)} className={toggleButtonClass(formData.applyingJointly)}>
@@ -586,6 +807,27 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
                   </Field>
 
                   {formData.applyingJointly && (
+                    <Field label="Income Calculation" icon={<Wallet className="h-4 w-4" />}>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => handleChange("incomeBasis", "husband-only")}
+                          className={toggleButtonClass(formData.incomeBasis === "husband-only")}
+                        >
+                          Husband only
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleChange("incomeBasis", "include-spouse")}
+                          className={toggleButtonClass(formData.incomeBasis === "include-spouse")}
+                        >
+                          Husband + spouse
+                        </button>
+                      </div>
+                    </Field>
+                  )}
+
+                  {shouldShowSpouseIncomeInput && (
                     <Field label="Spouse Monthly Income (RM)" icon={<Wallet className="h-4 w-4" />}>
                       <input
                         className={inputClass}
@@ -594,6 +836,14 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
                       />
                     </Field>
                   )}
+
+                  <Field label="Total Monthly Household Income (RM)" icon={<Wallet className="h-4 w-4" />}>
+                    <input
+                      className={inputClass}
+                      value={totalMonthlyHouseholdIncome.toLocaleString()}
+                      readOnly
+                    />
+                  </Field>
 
                   <Field label="Current Residential State" icon={<MapPin className="h-4 w-4" />}>
                     <div className="relative">
@@ -701,7 +951,7 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
                 <SummaryRow label="Employment" value={formData.employmentStatus} />
                 <SummaryRow label="State" value={formData.preferredState} />
                 <SummaryRow label="Budget" value={`RM ${formData.maxBudget.toLocaleString()}`} />
-                <SummaryRow label="Income" value={`RM ${Number(formData.householdIncome || 0).toLocaleString()}`} />
+                <SummaryRow label="Income" value={`RM ${totalMonthlyHouseholdIncome.toLocaleString()}`} />
                 <SummaryRow label="Financing" value={formData.financingStatus} />
               </div>
             </section>
@@ -726,18 +976,74 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
             <button
               type="button"
               onClick={async () => {
+                const token = localStorage.getItem("token");
+
+                if (!token) {
+                  navigate("/login");
+                  return;
+                }
+
                 const payload = {
-                  uid: "test-user-123", // ⚠️ TEMP UID (for testing)
-                  ...formData,
+                  personalInfo: {
+                    fullName: formData.fullName,
+                    nric: formData.nric,
+                    email: formData.email,
+                    age: formData.age,
+                    citizenship: formData.citizenship,
+                    race: formData.race,
+                    maritalStatus: formData.maritalStatus,
+                  },
+                  employmentDetails: {
+                    employmentStatus: formData.employmentStatus,
+                    jobSector: formData.jobSector,
+                    yearsOfEmployment: formData.yearsOfEmployment,
+                    workplaceLocation: formData.workplaceLocation,
+                    workplaceLat: formData.workplaceLat,
+                    workplaceLng: formData.workplaceLng,
+                  },
+                  propertyPreferences: {
+                    preferredState: formData.preferredState,
+                    maxBudget: formData.maxBudget,
+                    commuteRange: formData.commuteRange,
+                    priorities: formData.priorities,
+                    financing: {
+                      interestRate: formData.interestRate,
+                      loanTenure: formData.loanTenure,
+                      downpayment: formData.downpayment,
+                    },
+                  },
+                  eligibility: {
+                    firstTimeHomebuyer: formData.firstTimeHomebuyer,
+                    householdIncome: String(totalMonthlyHouseholdIncome),
+                    husbandIncome: formData.householdIncome,
+                    incomeBasis: formData.incomeBasis,
+                    dependents: formData.dependents,
+                    householdSize: formData.householdSize,
+                    ownResidentialProperty: formData.ownResidentialProperty,
+                    applyingJointly: formData.applyingJointly,
+                    includeSpouseIncome: shouldShowSpouseIncomeInput,
+                    spouseIncome: shouldShowSpouseIncomeInput ? formData.spouseIncome : "0",
+                    currentResidentialState: formData.currentResidentialState,
+                    financingStatus: formData.financingStatus,
+                  },
+                  schemeInterest: {
+                    selectedSchemes: formData.selectedSchemes,
+                  },
                 };
 
                 const res = await fetch("http://localhost:5000/users/update-profile", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                   },
                   body: JSON.stringify(payload),
                 });
+
+                if (!res.ok) {
+                  const errorBody = await res.text();
+                  throw new Error(errorBody || "Failed to update profile");
+                }
 
                 const data = await res.json();
 

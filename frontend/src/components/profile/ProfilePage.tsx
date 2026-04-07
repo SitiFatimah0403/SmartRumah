@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
@@ -8,6 +8,70 @@ export default function ProfilePage() {
   const [viewCount] = useState(128);
   const [collectionsCount] = useState(12);
   const [savedCount] = useState(45);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
+
+  const personalInfo = profile?.personalInfo || {};
+  const employmentDetails = profile?.employmentDetails || {};
+  const propertyPreferences = profile?.propertyPreferences || {};
+  const eligibility = profile?.eligibility || {};
+  const schemeInterest = profile?.schemeInterest || {};
+
+  const formatValue = (value: any) => {
+    if (value === undefined || value === null || value === "") {
+      return "-";
+    }
+
+    if (Array.isArray(value)) {
+      return value.length ? value.join(", ") : "-";
+    }
+
+    return String(value);
+  };
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:5000/users/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/login");
+          return;
+        }
+
+        if (res.status === 404) {
+          setProfile(null);
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+
+        const data = await res.json();
+        setProfile(data.profile || null);
+      } catch (error) {
+        console.error("Profile load error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
@@ -131,25 +195,78 @@ export default function ProfilePage() {
                 <span className="material-symbols-outlined text-white text-sm">edit</span>
               </div>
             </div>
-            <h2 className="text-2xl font-bold">Luqman Saifullah</h2>
+            <h2 className="text-2xl font-bold">
+              {loading
+                ? "Loading..."
+                : profile?.personalInfo?.fullName || auth.currentUser?.displayName || "New User"}
+            </h2>
             <p className="text-primary flex items-center gap-1 mt-1 text-sm justify-center">
               <span className="material-symbols-outlined text-sm">location_on</span>
-              Kuala Lumpur, Malaysia
+              {profile?.eligibility?.currentResidentialState || "Malaysia"}
             </p>
           </section>
 
           <section className="px-6 grid grid-cols-3 gap-4 mb-8 mt-6">
             <div className="bg-card-dark p-4 rounded-2xl text-center shadow-md border border-slate-800">
-              <span className="block text-xl font-bold text-white">{viewCount}</span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Viewed</span>
+              <span className="block text-xl font-bold text-white">{formatValue(personalInfo.age)}</span>
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Age</span>
             </div>
             <div className="bg-card-dark p-4 rounded-2xl text-center shadow-md border border-slate-800">
-              <span className="block text-xl font-bold text-white">{collectionsCount}</span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Collections</span>
+              <span className="block text-xl font-bold text-white">RM {formatValue(eligibility.householdIncome)}</span>
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Income</span>
             </div>
             <div className="bg-card-dark p-4 rounded-2xl text-center shadow-md border border-slate-800">
-              <span className="block text-xl font-bold text-white">{savedCount}</span>
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Saved</span>
+              <span className="block text-xl font-bold text-white">RM {formatValue(propertyPreferences.maxBudget)}</span>
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Budget</span>
+            </div>
+          </section>
+
+          <section className="px-6 space-y-4 mb-8">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest px-2">
+              Your Registration Details
+            </h3>
+
+            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
+              <p className="text-sm font-bold text-white">Personal Information</p>
+              <p className="text-xs text-slate-300">NRIC: {formatValue(personalInfo.nric)}</p>
+              <p className="text-xs text-slate-300">Email: {formatValue(personalInfo.email)}</p>
+              <p className="text-xs text-slate-300">Citizenship: {formatValue(personalInfo.citizenship)}</p>
+              <p className="text-xs text-slate-300">Race: {formatValue(personalInfo.race)}</p>
+              <p className="text-xs text-slate-300">Marital Status: {formatValue(personalInfo.maritalStatus)}</p>
+            </div>
+
+            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
+              <p className="text-sm font-bold text-white">Employment Details</p>
+              <p className="text-xs text-slate-300">Status: {formatValue(employmentDetails.employmentStatus)}</p>
+              <p className="text-xs text-slate-300">Sector: {formatValue(employmentDetails.jobSector)}</p>
+              <p className="text-xs text-slate-300">Years: {formatValue(employmentDetails.yearsOfEmployment)}</p>
+              <p className="text-xs text-slate-300">Workplace: {formatValue(employmentDetails.workplaceLocation)}</p>
+            </div>
+
+            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
+              <p className="text-sm font-bold text-white">Housing Preferences</p>
+              <p className="text-xs text-slate-300">Preferred State: {formatValue(propertyPreferences.preferredState)}</p>
+              <p className="text-xs text-slate-300">Commute Range: {formatValue(propertyPreferences.commuteRange)}</p>
+              <p className="text-xs text-slate-300">Priorities: {formatValue(propertyPreferences.priorities)}</p>
+              <p className="text-xs text-slate-300">Interest Rate: {formatValue(propertyPreferences?.financing?.interestRate)}</p>
+              <p className="text-xs text-slate-300">Loan Tenure: {formatValue(propertyPreferences?.financing?.loanTenure)}</p>
+              <p className="text-xs text-slate-300">Downpayment: {formatValue(propertyPreferences?.financing?.downpayment)}</p>
+            </div>
+
+            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
+              <p className="text-sm font-bold text-white">Scheme Eligibility</p>
+              <p className="text-xs text-slate-300">First-time Buyer: {formatValue(eligibility.firstTimeHomebuyer)}</p>
+              <p className="text-xs text-slate-300">Dependents: {formatValue(eligibility.dependents)}</p>
+              <p className="text-xs text-slate-300">Household Size: {formatValue(eligibility.householdSize)}</p>
+              <p className="text-xs text-slate-300">Own Property: {formatValue(eligibility.ownResidentialProperty)}</p>
+              <p className="text-xs text-slate-300">Applying Jointly: {formatValue(eligibility.applyingJointly)}</p>
+              <p className="text-xs text-slate-300">Spouse Income: {formatValue(eligibility.spouseIncome)}</p>
+              <p className="text-xs text-slate-300">Financing Status: {formatValue(eligibility.financingStatus)}</p>
+            </div>
+
+            <div className="bg-card-dark rounded-2xl p-4 border border-slate-800 space-y-2">
+              <p className="text-sm font-bold text-white">Scheme Interest</p>
+              <p className="text-xs text-slate-300">Selected Schemes: {formatValue(schemeInterest.selectedSchemes)}</p>
             </div>
           </section>
 
