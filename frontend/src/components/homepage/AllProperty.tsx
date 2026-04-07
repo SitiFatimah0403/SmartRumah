@@ -21,16 +21,24 @@ export default function AllProperty() {
   async function fetchData() {
     try {
       //nanti ni ubah
-      const user = {
-        employmentDetails: {
-          workplaceLat: 3.1319,
-          workplaceLng: 101.6841,
-        },
-        propertyPreferences: {
-          maxBudget: 500000,
-        },
-      };
-
+            const user = {
+      personalInfo: {
+        age: 25,
+      },
+      employmentDetails: {
+        workplaceLat: 3.1319,
+        workplaceLng: 101.6841,
+      },
+      propertyPreferences: {
+        preferredState: "Kuala Lumpur",
+        maxBudget: 500000,
+      },
+      eligibility: {
+        householdIncome: 5000,
+        firstTimeHomebuyer: true,
+      },
+    };
+    
       const res = await fetch("http://localhost:5000/recommendations", {
         method: "POST",
         headers: {

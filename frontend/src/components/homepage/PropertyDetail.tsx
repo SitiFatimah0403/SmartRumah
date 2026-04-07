@@ -1,6 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+type TrueCostData = {
+  estimatedTotal: number;
+  breakdown: {
+    mortgageTotal: number;
+    commuteAndTolls: number;
+    maintenanceFees: number;
+  };
+  mortgageDetails: {
+    principal: number;
+    interest: number;
+    propertyPrice?: number;
+    loanAmount?: number;
+  };
+};
 
 export default function PropertyDetail() {
   const navigate = useNavigate();
@@ -9,6 +23,9 @@ export default function PropertyDetail() {
   const [isSaved, setIsSaved] = useState(false);
   const [property, setProperty] = useState<any>(null);
   const [location, setLocation] = useState<any>(null);
+  const [trueCost, setTrueCost] = useState<TrueCostData | null>(null);
+  const [trueCostLoading, setTrueCostLoading] = useState(false);
+  const [trueCostError, setTrueCostError] = useState("");
   const [risk, setRisk] = useState<any>(null);
 
   const toggleSaved = () => {
@@ -109,6 +126,44 @@ export default function PropertyDetail() {
 
       setRisk(riskData);
 
+        // Fetch true monthly cost from backend costCalculator API.
+        setTrueCostLoading(true);
+        setTrueCostError("");
+        try {
+          const trueCostRes = await fetch(
+            "http://localhost:5000/api/calculate-true-cost",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                propertyId: id,
+                userProfile: {
+                  officeLocation: "Cyberjaya",
+                  isFirstTimeBuyer: true,
+                  downpaymentPercentage: 0,
+                },
+              }),
+            }
+          );
+
+          const trueCostJson = await trueCostRes.json();
+
+          if (!trueCostRes.ok || trueCostJson.status !== "success") {
+            throw new Error(trueCostJson.message || "Failed to calculate monthly cost");
+          }
+
+          setTrueCost(trueCostJson.data as TrueCostData);
+        } catch (costErr) {
+          setTrueCost(null);
+          setTrueCostError(
+            costErr instanceof Error
+              ? costErr.message
+              : "Unable to calculate monthly cost right now"
+          );
+        } finally {
+          setTrueCostLoading(false);
+        }
+
       } catch (err) {
         console.error("Fetch error:", err);
       }
@@ -129,6 +184,30 @@ export default function PropertyDetail() {
   if (property.Swimming_Pool === "Yes") facilities.push("Swimming Pool");
   if (property.Gym === "Yes") facilities.push("Gym");
   if (property.Playground === "Yes") facilities.push("Playground");
+
+  const formatCurrency = (value?: number) => {
+    if (typeof value !== "number" || !Number.isFinite(value)) return "N/A";
+    return `RM ${value.toLocaleString()}`;
+  };
+
+  const estimatedTotal = trueCost?.estimatedTotal || 0;
+  const mortgagePercent = estimatedTotal
+    ? (trueCost!.breakdown.mortgageTotal / estimatedTotal) * 100
+    : 0;
+  const commutePercent = estimatedTotal
+    ? (trueCost!.breakdown.commuteAndTolls / estimatedTotal) * 100
+    : 0;
+  const maintenancePercent = estimatedTotal
+    ? (trueCost!.breakdown.maintenanceFees / estimatedTotal) * 100
+    : 0;
+
+  const mortgageTotal = trueCost?.breakdown.mortgageTotal || 0;
+  const principalPercent = mortgageTotal
+    ? (trueCost!.mortgageDetails.principal / mortgageTotal) * 100
+    : 0;
+  const interestPercent = mortgageTotal
+    ? (trueCost!.mortgageDetails.interest / mortgageTotal) * 100
+    : 0;
 
   return (
     <div className="dark">
@@ -254,16 +333,19 @@ export default function PropertyDetail() {
             <span className="material-symbols-outlined text-primary">payments</span>
             Estimated Total Monthly Cost
           </h2>
+          {trueCostError && (
+            <p className="text-red-300 text-xs mb-3">Cost calculator: {trueCostError}</p>
+          )}
           <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden shadow-lg">
             <div className="p-6 pb-4">
               <div className="mb-4">
                 <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Monthly Cost Summary</p>
-                <p className="text-3xl font-extrabold text-white mt-1">{property.monthlyCost || "N/A"}<span className="text-sm font-normal text-slate-400"> / month</span></p>
+                <p className="text-3xl font-extrabold text-white mt-1">{trueCostLoading ? "Calculating..." : formatCurrency(trueCost?.estimatedTotal)}<span className="text-sm font-normal text-slate-400"> / month</span></p>
               </div>
               <div className="w-full h-3 flex rounded-full overflow-hidden mb-5 bg-slate-700/50">
-                <div className="h-full bg-accent-blue" style={{ width: "79.6%" }} title="Mortgage"></div>
-                <div className="h-full bg-accent-orange" style={{ width: "11.1%" }} title="Commute"></div>
-                <div className="h-full bg-accent-purple" style={{ width: "9.3%" }} title="Maintenance"></div>
+                <div className="h-full bg-accent-blue" style={{ width: `${mortgagePercent}%` }} title="Mortgage"></div>
+                <div className="h-full bg-accent-orange" style={{ width: `${commutePercent}%` }} title="Commute"></div>
+                <div className="h-full bg-accent-purple" style={{ width: `${maintenancePercent}%` }} title="Maintenance"></div>
               </div>
               <div className="grid grid-cols-1 gap-2.5">
                 <div className="flex justify-between items-center text-xs">
@@ -271,37 +353,37 @@ export default function PropertyDetail() {
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
                     <span className="text-slate-300">Mortgage</span>
                   </div>
-                  <span className="font-bold text-white">{property.mortgage || "N/A"}</span>
+                  <span className="font-bold text-white">{formatCurrency(trueCost?.breakdown.mortgageTotal)}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
                     <span className="text-slate-300">Commute & Tolls</span>
                   </div>
-                  <span className="font-bold text-white">{property.commute || "N/A"}</span>
+                  <span className="font-bold text-white">{formatCurrency(trueCost?.breakdown.commuteAndTolls)}</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
                     <span className="text-slate-300">Maintenance Fees</span>
                   </div>
-                  <span className="font-bold text-white">{property.maintenance || "N/A"}</span>
+                  <span className="font-bold text-white">{formatCurrency(trueCost?.breakdown.maintenanceFees)}</span>
                 </div>
               </div>
             </div>
             <div className="px-6 py-5 border-t border-slate-700/30">
               <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-4">Mortgage Breakdown</p>
               <div className="w-full h-2 flex rounded-full overflow-hidden mb-3 bg-slate-700/50">
-                <div className="h-full bg-primary" style={{ width: "33%" }} title="Principal"></div>
-                <div className="h-full bg-primary/30" style={{ width: "67%" }} title="Interest"></div>
+                <div className="h-full bg-primary" style={{ width: `${principalPercent}%` }} title="Principal"></div>
+                <div className="h-full bg-primary/30" style={{ width: `${interestPercent}%` }} title="Interest"></div>
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="text-white text-lg font-extrabold">{property.principal || "N/A"}</span>
+                  <span className="text-white text-lg font-extrabold">{formatCurrency(trueCost?.mortgageDetails.principal)}</span>
                   <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Principal</span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-white text-lg font-extrabold">{property.interest || "N/A"}</span>
+                  <span className="text-white text-lg font-extrabold">{formatCurrency(trueCost?.mortgageDetails.interest)}</span>
                   <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Interest</span>
                 </div>
               </div>
@@ -311,23 +393,23 @@ export default function PropertyDetail() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Property Price</p>
-                  <p className="text-white font-bold text-sm">{property.propertyPrice || "N/A"}</p>
+                  <p className="text-white font-bold text-sm">{formatCurrency(Number(property.Median_Price))}</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Loan Amount</p>
-                  <p className="text-white font-bold text-sm">{property.loanAmount || "N/A"}</p>
+                  <p className="text-white font-bold text-sm">{formatCurrency(trueCost?.mortgageDetails.loanAmount)}</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Interest Rate</p>
-                  <p className="text-white font-bold text-sm">{property.interestRate || "N/A"}</p>
+                  <p className="text-white font-bold text-sm">4.0%</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Loan Tenure</p>
-                  <p className="text-white font-bold text-sm">{property.loanTenure || "N/A"}</p>
+                  <p className="text-white font-bold text-sm">35 years</p>
                 </div>
                 <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-700/30 col-span-2">
                   <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight">Downpayment</p>
-                  <p className="text-white font-bold text-sm">{property.downpayment || "N/A"}</p>
+                  <p className="text-white font-bold text-sm">0% (First-time buyer)</p>
                 </div>
               </div>
             </div>

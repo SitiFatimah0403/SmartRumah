@@ -23,7 +23,10 @@ function calculateScore(p, user) {
   }
 
   // Location match
-  const distance = getDistance(p, 3.1390, 101.6869); // temp user location
+  const userLat = user.employmentDetails?.workplaceLat;
+  const userLng = user.employmentDetails?.workplaceLng;
+
+  const distance = getDistance(p, userLat, userLng);
 
     if (distance < 0.05) {
       score += 30; // VERY close
