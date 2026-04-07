@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -31,8 +31,6 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-
-let timeout: any;
 
 const states = [
   "Kuala Lumpur",
@@ -76,6 +74,10 @@ export default function SmartRumahCombinedPage() {
   };
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeSearchControllerRef = useRef<AbortController | null>(null);
+  const searchCacheRef = useRef<Map<string, { displayName: string; lat: number; lng: number }>>(new Map());
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -106,6 +108,7 @@ export default function SmartRumahCombinedPage() {
 
     firstTimeHomebuyer: true,
     householdIncome: "5500",
+    incomeBasis: "husband-only" as "husband-only" | "include-spouse",
     dependents: 2,
     householdSize: "3",
     ownResidentialProperty: "No",
@@ -117,37 +120,81 @@ export default function SmartRumahCombinedPage() {
     selectedSchemes: ["prima", "selangorku"] as SchemeKey[],
   });
 
-  const handleChange = <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
+  const handleChange = <K extends keyof typeof formData>(
+    field: K,
+    value: (typeof formData)[K],
+    markTouched = true
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+    if (markTouched) {
+      setTouchedFields((prev) => {
+        const next = new Set(prev);
+        next.add(String(field));
+        return next;
+      });
+    }
   };
+
+  useEffect(() => {
+    if (!formData.applyingJointly && formData.incomeBasis !== "husband-only") {
+      handleChange("incomeBasis", "husband-only", false);
+    }
+  }, [formData.applyingJointly, formData.incomeBasis]);
 
 
   const togglePriority = (label: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      priorities: prev.priorities.includes(label)
-        ? prev.priorities.filter((item) => item !== label)
-        : [...prev.priorities, label],
-    }));
+    const nextPriorities = formData.priorities.includes(label)
+      ? formData.priorities.filter((item) => item !== label)
+      : [...formData.priorities, label];
+    handleChange("priorities", nextPriorities);
   };
 
   const toggleScheme = (scheme: SchemeKey) => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedSchemes: prev.selectedSchemes.includes(scheme)
-        ? prev.selectedSchemes.filter((item) => item !== scheme)
-        : [...prev.selectedSchemes, scheme],
-    }));
+    const nextSchemes = formData.selectedSchemes.includes(scheme)
+      ? formData.selectedSchemes.filter((item) => item !== scheme)
+      : [...formData.selectedSchemes, scheme];
+    handleChange("selectedSchemes", nextSchemes);
   };
 
+  const husbandMonthlyIncome = Number(formData.householdIncome || 0);
+  const spouseMonthlyIncome =
+    formData.applyingJointly && formData.incomeBasis === "include-spouse"
+      ? Number(formData.spouseIncome || 0)
+      : 0;
+  const totalMonthlyHouseholdIncome = husbandMonthlyIncome + spouseMonthlyIncome;
+  const shouldShowSpouseIncomeInput =
+    formData.applyingJointly && formData.incomeBasis === "include-spouse";
+
   async function searchLocation(query: string) {
+    const normalized = query.trim().toLowerCase();
+
+    if (!normalized || normalized.length < 2) {
+      return;
+    }
+
+    const cached = searchCacheRef.current.get(normalized);
+    if (cached) {
+      handleChange("workplaceLat", cached.lat);
+      handleChange("workplaceLng", cached.lng);
+      handleChange("workplaceLocation", cached.displayName);
+      return;
+    }
+
+    if (activeSearchControllerRef.current) {
+      activeSearchControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    activeSearchControllerRef.current = controller;
+
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=my&limit=1`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=my&limit=1`,
         {
+          signal: controller.signal,
           headers: {
             "Accept": "application/json",
-            "User-Agent": "SmartRumahApp/1.0"
           }
         }
       );
@@ -157,23 +204,40 @@ export default function SmartRumahCombinedPage() {
 
       if (data.length > 0) {
         const place = data[0];
+        const lat = parseFloat(place.lat);
+        const lng = parseFloat(place.lon);
 
-        handleChange("workplaceLat", parseFloat(place.lat));
-        handleChange("workplaceLng", parseFloat(place.lon));
+        searchCacheRef.current.set(normalized, {
+          displayName: place.display_name,
+          lat,
+          lng,
+        });
+
+        handleChange("workplaceLat", lat);
+        handleChange("workplaceLng", lng);
         handleChange("workplaceLocation", place.display_name);
       }
 
     } catch (err) {
+      if ((err as Error).name === "AbortError") {
+        return;
+      }
       console.error(err);
+    } finally {
+      if (activeSearchControllerRef.current === controller) {
+        activeSearchControllerRef.current = null;
+      }
     }
   }
 
 function handleSearch(value: string) {
-  clearTimeout(timeout);
+  if (searchTimeoutRef.current) {
+    clearTimeout(searchTimeoutRef.current);
+  }
 
-  timeout = setTimeout(() => {
+  searchTimeoutRef.current = setTimeout(() => {
     searchLocation(value);
-  }, 600);
+  }, 280);
 }
 
   const handleSubmit = async () => {
@@ -212,6 +276,7 @@ function handleSearch(value: string) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         uid,
@@ -245,12 +310,15 @@ function handleSearch(value: string) {
         },
         eligibility: {
           firstTimeHomebuyer: formData.firstTimeHomebuyer,
-          householdIncome: formData.householdIncome,
+          householdIncome: String(totalMonthlyHouseholdIncome),
+          husbandIncome: formData.householdIncome,
+          incomeBasis: formData.incomeBasis,
           dependents: formData.dependents,
           householdSize: formData.householdSize,
           ownResidentialProperty: formData.ownResidentialProperty,
           applyingJointly: formData.applyingJointly,
-          spouseIncome: formData.spouseIncome,
+          includeSpouseIncome: shouldShowSpouseIncomeInput,
+          spouseIncome: shouldShowSpouseIncomeInput ? formData.spouseIncome : "0",
           currentResidentialState: formData.currentResidentialState,
           financingStatus: formData.financingStatus,
         },
@@ -283,21 +351,63 @@ function handleSearch(value: string) {
   );
 
   const toggleAllSchemes = () => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedSchemes: allSchemesSelected ? [] : schemeOptions.map((item) => item.key),
-    }));
+    handleChange(
+      "selectedSchemes",
+      allSchemesSelected ? [] : schemeOptions.map((item) => item.key)
+    );
   };
 
   const completedSections = useMemo(() => {
-    let score = 0;
-    if (formData.fullName && formData.email && formData.nric) score += 1;
-    if (formData.employmentStatus && formData.jobSector) score += 1;
-    if (formData.preferredState && formData.maxBudget) score += 1;
-    if (formData.householdIncome && formData.financingStatus) score += 1;
-    if (formData.selectedSchemes.length > 0) score += 1;
-    return score;
-  }, [formData]);
+    const isTouched = (field: keyof typeof formData) => touchedFields.has(String(field));
+    const hasText = (value: string) => value.trim().length > 0;
+
+    const section1Done =
+      isTouched("fullName") && hasText(formData.fullName) &&
+      isTouched("nric") && hasText(formData.nric) &&
+      isTouched("email") && hasText(formData.email) &&
+      isTouched("age") && hasText(formData.age) &&
+      isTouched("password") && hasText(formData.password) &&
+      isTouched("confirmPassword") && hasText(formData.confirmPassword) &&
+      formData.password.length >= 6 &&
+      formData.password === formData.confirmPassword &&
+      isTouched("citizenship") && hasText(formData.citizenship) &&
+      isTouched("maritalStatus") && hasText(formData.maritalStatus) &&
+      isTouched("race") && hasText(formData.race) &&
+      (formData.race !== "Others" || (isTouched("otherRace") && hasText(formData.otherRace)));
+
+    const section2Done =
+      isTouched("employmentStatus") && hasText(formData.employmentStatus) &&
+      isTouched("jobSector") && hasText(formData.jobSector) &&
+      isTouched("yearsOfEmployment") && formData.yearsOfEmployment >= 0 &&
+      isTouched("workplaceLocation") && hasText(formData.workplaceLocation) &&
+      isTouched("workplaceLat") && formData.workplaceLat !== null &&
+      isTouched("workplaceLng") && formData.workplaceLng !== null;
+
+    const section3Done =
+      isTouched("preferredState") && hasText(formData.preferredState) &&
+      isTouched("maxBudget") && formData.maxBudget > 0 &&
+      isTouched("commuteRange") && hasText(formData.commuteRange) &&
+      isTouched("priorities") && formData.priorities.length > 0 &&
+      isTouched("interestRate") && hasText(formData.interestRate) &&
+      isTouched("loanTenure") && hasText(formData.loanTenure) &&
+      isTouched("downpayment") && hasText(formData.downpayment);
+
+    const section4Done =
+      isTouched("firstTimeHomebuyer") &&
+      isTouched("householdIncome") && hasText(formData.householdIncome) &&
+      isTouched("dependents") && formData.dependents >= 0 &&
+      isTouched("householdSize") && hasText(formData.householdSize) &&
+      isTouched("ownResidentialProperty") && hasText(formData.ownResidentialProperty) &&
+      isTouched("applyingJointly") &&
+      (!formData.applyingJointly || isTouched("incomeBasis")) &&
+      (!shouldShowSpouseIncomeInput || (isTouched("spouseIncome") && hasText(formData.spouseIncome))) &&
+      isTouched("currentResidentialState") && hasText(formData.currentResidentialState) &&
+      isTouched("financingStatus") && hasText(formData.financingStatus);
+
+    const section5Done = isTouched("selectedSchemes") && formData.selectedSchemes.length > 0;
+
+    return [section1Done, section2Done, section3Done, section4Done, section5Done].filter(Boolean).length;
+  }, [formData, touchedFields, shouldShowSpouseIncomeInput]);
 
   const sectionTitleClass =
     "mb-1 text-xs font-bold uppercase tracking-[0.2em] text-emerald-500";
@@ -583,8 +693,8 @@ function handleSearch(value: string) {
                       handleChange("workplaceLat", null);
                       handleChange("workplaceLng", null);
 
-                      // 🔥 debounce search
-                      if (value.length > 3) {
+                      // debounce search
+                      if (value.length > 1) {
                         handleSearch(value);
                       }
                     }}
@@ -766,7 +876,7 @@ function handleSearch(value: string) {
                     </button>
                   </Field>
 
-                  <Field label="Monthly Household Income (RM)" icon={<Wallet className="h-4 w-4" />}>
+                  <Field label="Husband Monthly Income (RM)" icon={<Wallet className="h-4 w-4" />}>
                     <input
                       className={inputClass}
                       value={formData.householdIncome}
@@ -831,7 +941,10 @@ function handleSearch(value: string) {
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
-                        onClick={() => handleChange("applyingJointly", false)}
+                        onClick={() => {
+                          handleChange("applyingJointly", false);
+                          handleChange("incomeBasis", "husband-only");
+                        }}
                         className={toggleButtonClass(!formData.applyingJointly)}
                       >
                         No
@@ -847,6 +960,27 @@ function handleSearch(value: string) {
                   </Field>
 
                   {formData.applyingJointly && (
+                    <Field label="Income Calculation" icon={<Wallet className="h-4 w-4" />}>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => handleChange("incomeBasis", "husband-only")}
+                          className={toggleButtonClass(formData.incomeBasis === "husband-only")}
+                        >
+                          Husband only
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleChange("incomeBasis", "include-spouse")}
+                          className={toggleButtonClass(formData.incomeBasis === "include-spouse")}
+                        >
+                          Husband + spouse
+                        </button>
+                      </div>
+                    </Field>
+                  )}
+
+                  {shouldShowSpouseIncomeInput && (
                     <Field label="Spouse Monthly Income (RM)" icon={<Wallet className="h-4 w-4" />}>
                       <input
                         className={inputClass}
@@ -856,6 +990,14 @@ function handleSearch(value: string) {
                       />
                     </Field>
                   )}
+
+                  <Field label="Total Monthly Household Income (RM)" icon={<Wallet className="h-4 w-4" />}>
+                    <input
+                      className={inputClass}
+                      value={totalMonthlyHouseholdIncome.toLocaleString()}
+                      readOnly
+                    />
+                  </Field>
 
                   <Field label="Current Residential State" icon={<MapPin className="h-4 w-4" />}>
                     <div className="relative">
@@ -984,7 +1126,7 @@ function handleSearch(value: string) {
                 <SummaryRow label="Workplace" value={formData.workplaceLocation} />
                 <SummaryRow label="Preferred State" value={formData.preferredState} />
                 <SummaryRow label="Budget" value={`RM ${formData.maxBudget.toLocaleString()}`} />
-                <SummaryRow label="Household Income" value={`RM ${Number(formData.householdIncome || 0).toLocaleString()}`} />
+                <SummaryRow label="Household Income" value={`RM ${totalMonthlyHouseholdIncome.toLocaleString()}`} />
                 <SummaryRow label="Financing" value={formData.financingStatus} />
               </div>
             </section>

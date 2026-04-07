@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AllProperty from "./AllProperty";
-import HousingScheme from "./HousingScheme";
-import PropertyDetail from "./PropertyDetail";
-import ProfilePage from "../profile/ProfilePage";
-import ProfileEdit from "../profile/ProfileEdit";
-import SearchPage from "../search/SearchPage";
-import SavedPage from "../saved/SavedPage";
+import { buildRecommendationUser, getAuthenticatedProfile, getDisplayName } from "./userPayload";
 
 export type Property = {
   Property_ID: string;
@@ -24,51 +18,33 @@ export default function HomeDashboard() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [properties, setProperties] = useState<any[]>([]);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-  async function fetchData() {
-    try {
-      // ni hardcoded dullu sbb firestore belum siap, nanti kena adjust ikut data user sebenar
-      const user = {
-      personalInfo: {
-        age: 25,
-      },
-      employmentDetails: {
-        workplaceLat: 3.1319,
-        workplaceLng: 101.6841,
-      },
-      propertyPreferences: {
-        preferredState: "Kuala Lumpur",
-        maxBudget: 500000,
-      },
-      eligibility: {
-        householdIncome: 5000,
-        firstTimeHomebuyer: true,
-      },
-    };
+    async function fetchData() {
+      try {
+        const profileData = await getAuthenticatedProfile();
+        setProfile(profileData);
 
-      //const user = firestoreUserData -> ni time firestore dh siap
+        const userPayload = buildRecommendationUser(profileData);
 
-       const res = await fetch("http://localhost:5000/recommendations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user), 
-      });
+        const res = await fetch("http://localhost:5000/recommendations", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userPayload),
+        });
 
-      const data = await res.json();
-      console.log("DATA:", data);
-
-      setProperties(data);
-
-    } catch (err) {
-      console.error(err);
+        const data = await res.json();
+        setProperties(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
   
   const categories = [
     { id: "all", label: "All Homes" },
@@ -81,9 +57,11 @@ export default function HomeDashboard() {
     (p) => p.propertyType === "regular"
   );
 
-  const schemeProperties = properties.filter(
-    (p) => p.propertyType === "scheme"
+  const income = Number(profile?.eligibility?.householdIncome ?? 0);
+  const buyingPower = Number(
+    profile?.propertyPreferences?.maxBudget ?? (income > 0 ? income * 90 : 500000)
   );
+  const displayName = getDisplayName(profile);
 
   return (
     
@@ -102,7 +80,7 @@ export default function HomeDashboard() {
             <div>
               <p className="text-slate-400 text-xs font-medium">Good Morning</p>
               <h2 className="text-slate-100 text-lg font-bold leading-tight">
-                Welcome back, Luqman 👋
+                Welcome back, {displayName} 👋
               </h2>
             </div>
           </div>
@@ -133,12 +111,14 @@ export default function HomeDashboard() {
 
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className="text-3xl font-extrabold text-white tracking-tight">
-                    RM 450,000
+                    RM {buyingPower.toLocaleString()}
                   </span>
                 </div>
 
                 <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                  Based on your RM4.5k income &amp; commitments.
+                  {income > 0
+                    ? `Based on your RM${income.toLocaleString()} household income.`
+                    : "Complete your profile income to improve personalization."}
                 </p>
 
                 <button className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-background-dark font-bold rounded-xl transition-all flex items-center justify-center gap-2">

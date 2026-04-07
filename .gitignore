@@ -1,3 +1,4 @@
 node_modules
 firebaseKey.json
+**/firebaseKey.json
 .env

@@ -1,27 +1,12 @@
-const fs = require("fs/promises");
-const path = require("path");
 const axios = require("axios");
+const { getAllRegularHouses } = require("../houses/regularHouses/services");
+const { getAllHousingProjects } = require("../houses/housingScheme/services");
 
-async function loadAllRegularHouses() {
-  const listDirPath = path.join(
-    __dirname,
-    "..",
-    "houses",
-    "regularHouses",
-    "list"
-  );
-  const files = ["kl.json", "putrajaya.json", "selangor.json"];
+function loadAllProperties() {
+  const regularHouses = getAllRegularHouses();
+  const housingSchemes = getAllHousingProjects();
 
-  const fileContents = await Promise.all(
-    files.map((fileName) =>
-      fs.readFile(path.join(listDirPath, fileName), "utf8")
-    )
-  );
-
-  return fileContents.flatMap((content) => {
-    const parsed = JSON.parse(content);
-    return Array.isArray(parsed) ? parsed : [];
-  });
+  return [...regularHouses, ...housingSchemes];
 }
 
 async function getDrivingDistanceKm({ originLat, originLng, destination }) {
@@ -79,9 +64,9 @@ async function calculateTrueMonthlyCost({ propertyId, userProfile }) {
       throw error;
     }
 
-    const allProperties = await loadAllRegularHouses();
+    const allProperties = loadAllProperties();
     const foundProperty = allProperties.find(
-      (property) => property.Property_ID === propertyId
+      (property) => String(property.Property_ID) === String(propertyId)
     );
 
     if (!foundProperty) {

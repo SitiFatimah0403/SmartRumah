@@ -1,9 +1,9 @@
-const admin=require("./firebase")
+const { auth } = require("./firebase")
 
 async function verifyToken(token){
   try{
 
-    const decodedToken=await admin.auth().verifyIdToken(token)
+    const decodedToken = await auth.verifyIdToken(token)
 
     return decodedToken
   

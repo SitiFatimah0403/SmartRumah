@@ -1,10 +1,18 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getSavedProperties, setSavedProperties as persistSavedProperties } from "../../utils/savedProperties";
 
 export default function SavedPage() {
   const navigate = useNavigate();
 
   const [savedProperties, setSavedProperties] = useState<any[]>([]);
+  const [riskByPropertyId, setRiskByPropertyId] = useState<Record<string, { flood: string; landslide: string; safety: string }>>({});
+  const requestedRiskRef = useRef<Set<string>>(new Set());
+  const viewedPropertyIdsRef = useRef<Set<string>>(new Set());
+  const riskQueueRef = useRef<string[]>([]);
+  const isRiskQueueProcessingRef = useRef(false);
+  const cardObserverRef = useRef<IntersectionObserver | null>(null);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
   const location = useLocation();
 
   const handleBack = () => {
@@ -16,12 +24,121 @@ export default function SavedPage() {
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("savedProperties");
+    setSavedProperties(getSavedProperties());
+  }, []);
 
-    if (saved) {
-      setSavedProperties(JSON.parse(saved));
+  const fetchRiskForProperty = useCallback(async (id: string) => {
+    try {
+      const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ propertyId: id }),
+      });
+
+      const risk = await riskRes.json();
+
+      setRiskByPropertyId((prev) => ({
+        ...prev,
+        [id]: {
+          flood: String(risk?.floodRisk ?? "Unknown"),
+          landslide: String(risk?.landslideRisk ?? "Unknown"),
+          safety: String(risk?.safetyIndex ?? "Unknown"),
+        },
+      }));
+    } catch (err) {
+      console.error("Saved risk error:", err);
+      setRiskByPropertyId((prev) => ({
+        ...prev,
+        [id]: {
+          flood: "Unknown",
+          landslide: "Unknown",
+          safety: "Unknown",
+        },
+      }));
     }
   }, []);
+
+  const processRiskQueue = useCallback(async () => {
+    if (isRiskQueueProcessingRef.current) {
+      return;
+    }
+
+    isRiskQueueProcessingRef.current = true;
+
+    try {
+      while (riskQueueRef.current.length > 0) {
+        const nextId = riskQueueRef.current.shift();
+
+        if (!nextId) {
+          continue;
+        }
+
+        await fetchRiskForProperty(nextId);
+      }
+    } finally {
+      isRiskQueueProcessingRef.current = false;
+    }
+  }, [fetchRiskForProperty]);
+
+  const enqueueRiskFetch = useCallback((propertyId: string) => {
+    if (!propertyId || requestedRiskRef.current.has(propertyId)) {
+      return;
+    }
+
+    requestedRiskRef.current.add(propertyId);
+    riskQueueRef.current.push(propertyId);
+    void processRiskQueue();
+  }, [processRiskQueue]);
+
+  useEffect(() => {
+    if (cardObserverRef.current) {
+      cardObserverRef.current.disconnect();
+    }
+
+    cardObserverRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+
+          const propertyId = (entry.target as HTMLElement).dataset.savedPropertyId;
+
+          if (!propertyId || viewedPropertyIdsRef.current.has(propertyId)) {
+            return;
+          }
+
+          viewedPropertyIdsRef.current.add(propertyId);
+          enqueueRiskFetch(propertyId);
+        });
+      },
+      {
+        root: scrollContainerRef.current,
+        threshold: 0.35,
+      }
+    );
+
+    return () => {
+      cardObserverRef.current?.disconnect();
+    };
+  }, [enqueueRiskFetch]);
+
+  useEffect(() => {
+    if (!cardObserverRef.current) {
+      return;
+    }
+
+    const observer = cardObserverRef.current;
+    const cardElements = Array.from(document.querySelectorAll("[data-saved-property-id]"));
+
+    cardElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      cardElements.forEach((el) => observer.unobserve(el));
+    };
+  }, [savedProperties]);
 
   const handleRemoveSaved = (id: string) => {
     const updated = savedProperties.filter(
@@ -30,8 +147,8 @@ export default function SavedPage() {
 
     setSavedProperties(updated);
 
-    //update local storage
-    localStorage.setItem("savedProperties", JSON.stringify(updated));
+    // Persist under the current user-scoped key.
+    persistSavedProperties(updated);
   };
 
   return (
@@ -64,11 +181,12 @@ export default function SavedPage() {
           </div>
         </header>
 
-        <section className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+        <section ref={scrollContainerRef as React.RefObject<HTMLElement>} className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
           {savedProperties.length > 0 ? (
             savedProperties.map((property) => (
               <article
                 key={property.Property_ID}
+                data-saved-property-id={String(property.Property_ID)}
                 className="bg-card-dark rounded-3xl overflow-hidden border border-slate-800 shadow-lg hover:shadow-xl transition-shadow"
               >
                 <div className="relative h-56 w-full">
@@ -130,21 +248,21 @@ export default function SavedPage() {
                       <div className="flex items-center gap-2 text-primary">
                         <span className="material-symbols-outlined text-base">water_drop</span>
                         <span className="text-[10px] font-bold uppercase">
-                          Flood: {property.flood}
+                          Flood: {riskByPropertyId[String(property.Property_ID)]?.flood || "Loading..."}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2 text-primary">
                         <span className="material-symbols-outlined text-base">terrain</span>
                         <span className="text-[10px] font-bold uppercase">
-                          Landslide: {property.landslide}
+                          Landslide: {riskByPropertyId[String(property.Property_ID)]?.landslide || "Loading..."}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2 text-primary">
                         <span className="material-symbols-outlined text-base">shield</span>
                         <span className="text-[10px] font-bold uppercase">
-                          Safety: {property.safety}
+                          Safety: {riskByPropertyId[String(property.Property_ID)]?.safety || "Loading..."}
                         </span>
                       </div>
 

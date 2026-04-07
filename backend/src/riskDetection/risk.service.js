@@ -1,9 +1,10 @@
 const axios = require("axios");
-
-const properties = require("./data/properties.json");
+const { getAllRegularHouses } = require("../houses/regularHouses/services");
+const { getAllHousingProjects } = require("../houses/housingScheme/services");
 
 const getPropertyById = (id) => {
-  return properties.find(p => p.id === id);
+  const allProperties = [...getAllRegularHouses(), ...getAllHousingProjects()];
+  return allProperties.find((property) => String(property.Property_ID) === String(id));
 };
 
 const processRisk = async (propertyId) => {
@@ -15,7 +16,13 @@ const processRisk = async (propertyId) => {
       throw new Error("Property not found");
     }
 
-    const { lat, lng, area } = property;
+    const lat = Number(property.Lat);
+    const lng = Number(property.Lng);
+    const area = String(property.State || property.Area || "");
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      throw new Error("Property coordinates are invalid");
+    }
 
     //ni yang akan call API elevation
     let elevation;
@@ -48,11 +55,13 @@ const processRisk = async (propertyId) => {
 
     //RAINFALL LOGIC - based on area
     let rainfall;
-    if (area === "KL") {
+    const normalizedArea = area.toLowerCase();
+
+    if (normalizedArea.includes("kuala lumpur") || normalizedArea === "kl") {
       rainfall = 2400;
-    } else if (area === "Selangor") {
+    } else if (normalizedArea.includes("selangor")) {
       rainfall = 2500;
-    } else if (area === "Putrajaya") {
+    } else if (normalizedArea.includes("putrajaya")) {
       rainfall = 2300;
     } else {
       rainfall = 2000; // default fallback

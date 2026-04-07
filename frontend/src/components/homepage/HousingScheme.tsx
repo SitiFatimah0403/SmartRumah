@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildRecommendationUser, getAuthenticatedProfile, getDisplayName } from "./userPayload";
 
 export default function HousingScheme() {
   const navigate = useNavigate();
   const [selectedScheme, setSelectedScheme] = useState("all");
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [profile, setProfile] = useState<any>(null);
 
   const schemes = [
     { id: "all", label: "All Schemes" },
@@ -50,48 +52,36 @@ export default function HousingScheme() {
   };
 
   useEffect(() => {
-  async function fetchData() {
-    try {
-      //nanti ni ubah
-      const user = {
-      personalInfo: {
-        age: 25,
-      },
-      employmentDetails: {
-        workplaceLat: 3.1319,
-        workplaceLng: 101.6841,
-      },
-      propertyPreferences: {
-        preferredState: "Kuala Lumpur",
-        maxBudget: 500000,
-      },
-      eligibility: {
-        householdIncome: 5000,
-        firstTimeHomebuyer: true,
-      },
-    };
+    async function fetchData() {
+      try {
+        const profileData = await getAuthenticatedProfile();
+        setProfile(profileData);
 
-      const res = await fetch("http://localhost:5000/housing-schemes/eligible", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    });
+        const userPayload = buildRecommendationUser(profileData);
 
-      const data = await res.json();
+        const res = await fetch("http://localhost:5000/housing-schemes/eligible", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userPayload),
+        });
 
-     
-      console.log("API RESPONSE:", data); 
-      setProperties(data.matchingProjects);
-
-    } catch (err) {
-      console.error(err);
+        const data = await res.json();
+        setProperties(Array.isArray(data?.matchingProjects) ? data.matchingProjects : []);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
+
+  const income = Number(profile?.eligibility?.householdIncome ?? 0);
+  const buyingPower = Number(
+    profile?.propertyPreferences?.maxBudget ?? (income > 0 ? income * 90 : 500000)
+  );
+  const displayName = getDisplayName(profile);
 
   return (
     <div className="dark">
@@ -108,7 +98,7 @@ export default function HousingScheme() {
             <div>
               <p className="text-slate-400 text-xs font-medium">Good Morning</p>
               <h2 className="text-slate-100 text-lg font-bold leading-tight">
-                Welcome back, Luqman 👋
+                Welcome back, {displayName} 👋
               </h2>
             </div>
           </div>
@@ -138,12 +128,14 @@ export default function HousingScheme() {
 
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className="text-3xl font-extrabold text-white tracking-tight">
-                    RM 450,000
+                    RM {buyingPower.toLocaleString()}
                   </span>
                 </div>
 
                 <p className="text-slate-400 text-sm leading-relaxed mb-6">
-                  Based on your RM4.5k income & commitments.
+                  {income > 0
+                    ? `Based on your RM${income.toLocaleString()} household income.`
+                    : "Complete your profile income to improve personalization."}
                 </p>
 
                 <button className="w-full py-3 px-4 bg-primary hover:bg-primary/90 text-background-dark font-bold rounded-xl transition-all flex items-center justify-center gap-2">

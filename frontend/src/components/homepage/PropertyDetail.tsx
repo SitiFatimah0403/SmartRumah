@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getSavedProperties, setSavedProperties } from "../../utils/savedProperties";
 
 type TrueCostData = {
   estimatedTotal: number;
@@ -29,7 +30,7 @@ export default function PropertyDetail() {
   const [risk, setRisk] = useState<any>(null);
 
   const toggleSaved = () => {
-  let savedList = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+  const savedList = getSavedProperties();
 
   const exists = savedList.find(
     (item: any) => item.Property_ID === property.Property_ID
@@ -55,7 +56,7 @@ export default function PropertyDetail() {
     setIsSaved(true);
   }
 
-  localStorage.setItem("savedProperties", JSON.stringify(updated));
+  setSavedProperties(updated);
 
   console.log("UPDATED FROM DETAIL:", updated);
 };
@@ -63,10 +64,6 @@ export default function PropertyDetail() {
 
 
   useEffect(() => {
-
-    const savedList = JSON.parse(localStorage.getItem("savedProperties") || "[]");
-
-    
     async function fetchData() {
       try {
         // Fetch property details
@@ -95,7 +92,7 @@ export default function PropertyDetail() {
       setProperty(propertyData);
 
       // 🔥 ADD THIS
-      const savedList = JSON.parse(localStorage.getItem("savedProperties") || "[]");
+      const savedList = getSavedProperties();
 
       const exists = savedList.find(
         (item: any) => item.Property_ID === propertyData.Property_ID
