@@ -157,4 +157,4 @@ async function calculateTrueMonthlyCost({ propertyId, userProfile }) {
   }
 }
 
-module.exports = { calculateTrueMonthlyCost };
+module.exports = { calculateTrueMonthlyCost, getDrivingDistanceKm };
