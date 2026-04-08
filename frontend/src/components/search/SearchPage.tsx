@@ -30,10 +30,8 @@ export default function SearchPage() {
   const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
   const [riskByPropertyId, setRiskByPropertyId] = useState<Record<string, { flood: string; landslide: string; safety: string }>>({});
   const requestedRiskRef = useRef<Set<string>>(new Set());
-  const viewedPropertyIdsRef = useRef<Set<string>>(new Set());
   const riskQueueRef = useRef<string[]>([]);
   const isRiskQueueProcessingRef = useRef(false);
-  const cardObserverRef = useRef<IntersectionObserver | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
 
@@ -267,58 +265,14 @@ const handleAreaClick = (areaName: string) => {
   }, [processRiskQueue]);
 
   useEffect(() => {
-    if (!hasSearched) {
+    if (!hasSearched || filteredProperties.length === 0) {
       return;
     }
 
-    if (cardObserverRef.current) {
-      cardObserverRef.current.disconnect();
-    }
-
-    cardObserverRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) {
-            return;
-          }
-
-          const propertyId = (entry.target as HTMLElement).dataset.propertyId;
-
-          if (!propertyId || viewedPropertyIdsRef.current.has(propertyId)) {
-            return;
-          }
-
-          viewedPropertyIdsRef.current.add(propertyId);
-          enqueueRiskFetch(propertyId);
-        });
-      },
-      {
-        root: mainRef.current,
-        threshold: 0.35,
-      }
-    );
-
-    return () => {
-      cardObserverRef.current?.disconnect();
-    };
-  }, [hasSearched, enqueueRiskFetch]);
-
-  useEffect(() => {
-    if (!cardObserverRef.current || !hasSearched) {
-      return;
-    }
-
-    const observer = cardObserverRef.current;
-    const cardElements = Array.from(
-      document.querySelectorAll("[data-property-id]")
-    );
-
-    cardElements.forEach((el) => observer.observe(el));
-
-    return () => {
-      cardElements.forEach((el) => observer.unobserve(el));
-    };
-  }, [hasSearched, visibleProperties]);
+    filteredProperties.forEach((property) => {
+      enqueueRiskFetch(String(property.Property_ID));
+    });
+  }, [hasSearched, filteredProperties, enqueueRiskFetch]);
 
   useEffect(() => {
     if (!hasSearched || !sentinelRef.current || filteredProperties.length <= visibleCount) {
@@ -524,7 +478,7 @@ const handleAreaClick = (areaName: string) => {
 
               <div className="space-y-6">
                 {visibleProperties.map((property) => {
-                  const propertyRisk = riskByPropertyId[property.Property_ID];
+                  const propertyRisk = riskByPropertyId[String(property.Property_ID)];
                   return (
                     <div
                       key={property.Property_ID}

@@ -68,7 +68,7 @@ export default function HomeDashboard() {
     <div className="dark">
       <div className="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col">
         {/* Top Header */}
-        <header className="flex items-center justify-between px-6 pt-8 pb-4 bg-background-dark sticky top-0 z-10">
+        <header className="flex items-center justify-between px-6 pt-8 pb-4 bg-background-dark sticky top-0 z-50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden">
               <img
@@ -93,7 +93,7 @@ export default function HomeDashboard() {
           </button>
         </header>
 
-        <main className="flex-1 overflow-y-auto pb-24">
+        <main className="relative z-0 flex-1 overflow-y-auto pb-24">
           {/* Summary Card */}
           <section className="px-6 py-4">
             <div className="relative overflow-hidden rounded-2xl bg-card-dark border border-slate-800 p-6 shadow-xl">
