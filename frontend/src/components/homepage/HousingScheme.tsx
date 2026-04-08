@@ -13,7 +13,6 @@ export default function HousingScheme() {
     { id: "pr1ma", label: "PR1MA" },
     { id: "rumawip", label: "RUMAWIP" },
     { id: "selangorku", label: "Selangorku" },
-    { id: "myhome", label: "MyHome" },
   ];
 
   const [properties, setProperties] = useState<any[]>([]);

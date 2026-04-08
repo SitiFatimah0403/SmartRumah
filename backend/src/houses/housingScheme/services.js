@@ -34,10 +34,33 @@ const housingProjects = require("./housingScheme.json");
 
       return schemeMatch;
     })
-    .map(project => ({
+    .map(project => {
+    const distance = getDistance(project, userLat, userLng);
+
+    let matchScore = 0;
+
+    // Distance scoring
+    if (distance < 0.05) matchScore += 40;
+    else if (distance < 0.1) matchScore += 30;
+    else matchScore += 20;
+
+    // Budget scoring
+    if (project.Median_Price <= user.propertyPreferences.maxBudget) {
+      matchScore += 40;
+    }
+
+    // Feature scoring
+    if (project.Bedroom >= 3) {
+      matchScore += 20;
+    }
+
+    return {
       ...project,
-      distance: getDistance(project, userLat, userLng)
-    }))
+      distance,
+      matchScore,        
+      propertyType: "scheme" 
+    };
+  })
     .sort((a, b) => a.distance - b.distance)
     .slice(0, 20);
 
