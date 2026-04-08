@@ -359,7 +359,10 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://lh3.googleusercontent.com/d/1cWn19_8W8rYJLexpn9LFjEjS_BAh1XOp"
+
+
   },
   {
     "Property_ID":"HS12",
@@ -391,7 +394,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"PR1MA"
+    "Housing_Scheme":"PR1MA",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775631911/HS12_eoabgm.jpg"
   },
   {
     "Property_ID":"HS13",
@@ -423,7 +427,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775631975/HS13_cxk8d4.jpg"
   },
   {
     "Property_ID":"HS14",
@@ -455,7 +460,8 @@
     "Swimming_Pool":"No",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775632012/HS14_dmvzju.jpg"
   },
   {
     "Property_ID":"HS15",
@@ -487,7 +493,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630814/HS15_hsavvp.jpg"
   },
   {
     "Property_ID":"HS16",
@@ -519,7 +526,9 @@
     "Swimming_Pool":"No",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630814/HS16_r7irlv.jpg"
+
   },
   {
     "Property_ID":"HS17",
@@ -551,7 +560,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630814/HS16_r7irlv.jpg"
   },
   {
     "Property_ID":"HS18",
@@ -583,7 +593,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630816/HS18_ufdeqf.jpg"
   },
   {
     "Property_ID":"HS19",
@@ -615,7 +626,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630815/HS19_oo1yym.jpg"
   },
   {
     "Property_ID":"HS20",
@@ -647,7 +659,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"No",
     "Playground":"Yes",
-    "Housing_Scheme":"PR1MA"
+    "Housing_Scheme":"PR1MA",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630815/HS20_bvz5l3.jpg"
   },
   {
     "Property_ID":"HS21",
@@ -679,7 +692,8 @@
     "Swimming_Pool":"No",
     "Gym":"No",
     "Playground":"No",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630816/HS21_mzn62p.jpg"
   },
   {
     "Property_ID":"HS22",
@@ -711,7 +725,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630815/HS22_suoayy.jpg"
   },
   {
     "Property_ID":"HS23",
@@ -743,7 +758,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"No",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630815/HS23_vduo7v.jpg"
   },
   {
     "Property_ID":"HS24",
@@ -775,7 +791,8 @@
     "Swimming_Pool":"No",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630816/HS24_w9rhzd.jpg"
   },
   {
     "Property_ID":"HS25",
@@ -807,7 +824,8 @@
     "Swimming_Pool":"No",
     "Gym":"No",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage":"https://res.cloudinary.com/dkjxcwska/image/upload/v1775630816/HS24_w9rhzd.jpg"
   },
   {
     "Property_ID":"HS26",
@@ -839,7 +857,9 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630817/HS26_c0efxw.jpg"
+
   },
   {
     "Property_ID":"HS27",
@@ -871,7 +891,9 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"No",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630817/HS27_jyv3lm.jpg"
+
   },
   {
     "Property_ID":"HS28",
@@ -903,7 +925,8 @@
     "Swimming_Pool":"No",
     "Gym":"No",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630814/HS28_fwfh4e.jpg"
   },
   {
     "Property_ID":"HS29",
@@ -935,7 +958,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630815/HS29_vrwgws.jpg"
   },
   {
     "Property_ID":"HS30",
@@ -967,7 +991,8 @@
     "Swimming_Pool":"Yes",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"SELANGORKU"
+    "Housing_Scheme":"SELANGORKU",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630815/HS30_fd50in.jpg"
   },
   {
     "Property_ID":"HS31",
@@ -999,6 +1024,7 @@
     "Swimming_Pool":"No",
     "Gym":"Yes",
     "Playground":"Yes",
-    "Housing_Scheme":"RUMAWIP"
+    "Housing_Scheme":"RUMAWIP",
+    "propertyImage": "https://res.cloudinary.com/dkjxcwska/image/upload/v1775630815/HS31_wkimp0.jpg"
   }
 ]
