@@ -197,7 +197,7 @@ export default function SavedPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-4 left-4 bg-primary/90 text-white text-[10px] font-bold px-3 py-1 rounded-full">
-                    {property.matchScore} MATCH
+                    {property.suitabilityScore ?? property.matchScore ?? "-"} MATCH
                   </div>
                   <button
                     onClick={() => handleRemoveSaved(property.Property_ID)}

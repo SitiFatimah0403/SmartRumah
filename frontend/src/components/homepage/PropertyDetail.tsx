@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getSavedProperties, setSavedProperties } from "../../utils/savedProperties";
+import { auth } from "../../firebase";
+import { getAuthenticatedProfile } from "./userPayload";
 
 type TrueCostData = {
   estimatedTotal: number;
@@ -17,6 +19,26 @@ type TrueCostData = {
   };
 };
 
+type SuitabilityFactor = {
+  factor: string;
+  weight: number;
+  score: number;
+  contribution: number;
+  rawMetrics?: Record<string, any>;
+  reasons?: string[];
+};
+
+type SuitabilityData = {
+  scoringVersion: string;
+  propertyId: string;
+  propertyName: string;
+  finalScore: number;
+  weightsUsed: Record<string, number>;
+  factorBreakdown: SuitabilityFactor[];
+  meta?: {
+    generatedAt?: string;
+  };
+};
 export default function PropertyDetail() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -28,44 +50,68 @@ export default function PropertyDetail() {
   const [trueCostLoading, setTrueCostLoading] = useState(false);
   const [trueCostError, setTrueCostError] = useState("");
   const [risk, setRisk] = useState<any>(null);
+  const [suitability, setSuitability] = useState<SuitabilityData | null>(null);
+  const [suitabilityLoading, setSuitabilityLoading] = useState(false);
+  const [suitabilityError, setSuitabilityError] = useState("");
+
+  const parseDownpaymentPercentage = (value: unknown) => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value > 1 ? value / 100 : value;
+    }
+
+    if (typeof value === "string") {
+      const cleaned = value.trim().replace("%", "");
+      const parsed = Number(cleaned);
+
+      if (Number.isFinite(parsed)) {
+        return parsed > 1 ? parsed / 100 : parsed;
+      }
+    }
+
+    return 0;
+  };
 
   const toggleSaved = () => {
-  const savedList = getSavedProperties();
+    const savedList = getSavedProperties();
 
-  const exists = savedList.find(
-    (item: any) => item.Property_ID === property.Property_ID
-  );
-
-  let updated;
-
-  if (exists) {
-    updated = savedList.filter(
-      (item: any) => item.Property_ID !== property.Property_ID
+    const exists = savedList.find(
+      (item: any) => item.Property_ID === property.Property_ID
     );
-    setIsSaved(false);
-  } else {
-    updated = [
-      ...savedList,
-      {
-        ...property,
-        flood: risk?.floodRisk,
-        landslide: risk?.landslideRisk,
-        safety: risk?.safetyIndex,
-      }
-    ];
-    setIsSaved(true);
-  }
 
-  setSavedProperties(updated);
+    let updated;
 
-  console.log("UPDATED FROM DETAIL:", updated);
-};
+    if (exists) {
+      updated = savedList.filter(
+        (item: any) => item.Property_ID !== property.Property_ID
+      );
+      setIsSaved(false);
+    } else {
+      updated = [
+        ...savedList,
+        {
+          ...property,
+          flood: risk?.floodRisk,
+          landslide: risk?.landslideRisk,
+          safety: risk?.safetyIndex,
+          suitabilityScore: suitability?.finalScore,
+          suitabilityBreakdown: suitability?.factorBreakdown,
+        }
+      ];
+      setIsSaved(true);
+    }
+
+    setSavedProperties(updated);
+
+    console.log("UPDATED FROM DETAIL:", updated);
+  };
   
 
 
   useEffect(() => {
     async function fetchData() {
       try {
+        const profileData = await getAuthenticatedProfile();
+
         // Fetch property details
         let propertyData = null;
 
@@ -123,10 +169,80 @@ export default function PropertyDetail() {
 
       setRisk(riskData);
 
+        setSuitabilityLoading(true);
+        setSuitabilityError("");
+
+        try {
+          let token = localStorage.getItem("token");
+
+          if (!token && auth.currentUser) {
+            token = await auth.currentUser.getIdToken();
+            localStorage.setItem("token", token);
+          }
+
+          if (!token) {
+            throw new Error("Login token not found");
+          }
+
+          let suitabilityRes = await fetch(
+            "http://localhost:5000/api/calculate-suitability",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ propertyId: id }),
+            }
+          );
+
+          if (suitabilityRes.status === 401 && auth.currentUser) {
+            const refreshedToken = await auth.currentUser.getIdToken(true);
+            localStorage.setItem("token", refreshedToken);
+
+            suitabilityRes = await fetch(
+              "http://localhost:5000/api/calculate-suitability",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${refreshedToken}`,
+                },
+                body: JSON.stringify({ propertyId: id }),
+              }
+            );
+          }
+
+          const suitabilityJson = await suitabilityRes.json();
+
+          if (!suitabilityRes.ok || suitabilityJson.status !== "success") {
+            throw new Error(
+              suitabilityJson.message || "Failed to calculate suitability"
+            );
+          }
+
+          setSuitability(suitabilityJson.data as SuitabilityData);
+        } catch (suitabilityErr) {
+          setSuitability(null);
+          setSuitabilityError(
+            suitabilityErr instanceof Error
+              ? suitabilityErr.message
+              : "Unable to calculate suitability right now"
+          );
+        } finally {
+          setSuitabilityLoading(false);
+        }
+
         // Fetch true monthly cost from backend costCalculator API.
         setTrueCostLoading(true);
         setTrueCostError("");
         try {
+          const workplaceLocation =
+            profileData?.employmentDetails?.workplaceLocation || "Cyberjaya";
+          const downpaymentPercentage = parseDownpaymentPercentage(
+            profileData?.propertyPreferences?.financing?.downpayment
+          );
+
           const trueCostRes = await fetch(
             "http://localhost:5000/api/calculate-true-cost",
             {
@@ -135,9 +251,9 @@ export default function PropertyDetail() {
               body: JSON.stringify({
                 propertyId: id,
                 userProfile: {
-                  officeLocation: "Cyberjaya",
+                  officeLocation: workplaceLocation,
                   isFirstTimeBuyer: true,
-                  downpaymentPercentage: 0,
+                  downpaymentPercentage,
                 },
               }),
             }
@@ -188,6 +304,7 @@ export default function PropertyDetail() {
   };
 
   const estimatedTotal = trueCost?.estimatedTotal || 0;
+  const suitabilityScore = suitability?.finalScore ?? property.matchScore ?? 85;
   const mortgagePercent = estimatedTotal
     ? (trueCost!.breakdown.mortgageTotal / estimatedTotal) * 100
     : 0;
@@ -205,6 +322,52 @@ export default function PropertyDetail() {
   const interestPercent = mortgageTotal
     ? (trueCost!.mortgageDetails.interest / mortgageTotal) * 100
     : 0;
+
+  const suitabilityFactors = suitability?.factorBreakdown ?? [];
+  const suitabilityFactorColors: Record<string, string> = {
+    risk: "#22c55e",
+    commute: "#38bdf8",
+    affordability: "#f59e0b",
+    preference: "#a855f7",
+    schemeEligibility: "#f97316",
+  };
+
+  const suitabilitySlices = suitabilityFactors.length
+    ? suitabilityFactors.map((factor) => {
+        const label = factor.factor.replace(/([A-Z])/g, " $1");
+        const color = suitabilityFactorColors[factor.factor] || "#94a3b8";
+
+        return {
+          label,
+          color,
+          score: Number(factor.score || 0),
+          contribution: Number(factor.contribution || 0),
+          weight: Number(factor.weight || 0),
+        };
+      })
+    : [];
+
+  const suitabilityTotalContribution = suitabilitySlices.reduce(
+    (sum, item) => sum + item.contribution,
+    0
+  );
+
+  let suitabilityRunningOffset = 0;
+  const suitabilityChartSegments = suitabilitySlices.map((item) => {
+    const segmentLength =
+      suitabilityTotalContribution > 0
+        ? (item.contribution / suitabilityTotalContribution) * 2 * Math.PI * 56
+        : 0;
+
+    const segment = {
+      ...item,
+      length: segmentLength,
+      offset: suitabilityRunningOffset,
+    };
+
+    suitabilityRunningOffset += segmentLength;
+    return segment;
+  });
 
   return (
     <div className="dark">
@@ -272,24 +435,113 @@ export default function PropertyDetail() {
           </div>
         </section>
 
-        <section className="px-4 relative z-10 mt-4">
-          <div className="bg-slate-900/80 border border-primary/30 backdrop-blur-xl rounded-xl p-5 shadow-[0_0_20px_rgba(16,185,129,0.15)] flex items-center gap-4">
-            <div className="flex flex-col items-center justify-center bg-primary/20 rounded-lg p-3 min-w-[80px]">
-              <span className="text-3xl font-bold text-primary">{property.matchScore || 85}</span>
-            </div>
-            <div className="flex flex-col">
-              <p className="text-white font-bold text-lg">Overall Suitability Score</p>
-              <p className="text-slate-400 text-sm">Highly Recommended based on your profile.</p>
+        <section className="px-4 mt-8">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+            <span className="material-symbols-outlined text-primary">donut_large</span>
+            Suitability Breakdown
+          </h2>
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5 shadow-lg">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-center gap-5">
+                <div className="relative h-44 w-44 shrink-0 rounded-full bg-slate-950/80 border border-slate-700/60 p-3">
+                  <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
+                    <circle
+                      cx="70"
+                      cy="70"
+                      r="56"
+                      fill="none"
+                      stroke="#1e293b"
+                      strokeWidth="18"
+                    />
+                    {suitabilityChartSegments.length ? (
+                      suitabilityChartSegments.map((segment) => (
+                        <circle
+                          key={segment.label}
+                          cx="70"
+                          cy="70"
+                          r="56"
+                          fill="none"
+                          stroke={segment.color}
+                          strokeWidth="18"
+                          strokeLinecap="round"
+                          strokeDasharray={`${segment.length} ${2 * Math.PI * 56 - segment.length}`}
+                          strokeDashoffset={-segment.offset}
+                        />
+                      ))
+                    ) : (
+                      <circle
+                        cx="70"
+                        cy="70"
+                        r="56"
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="18"
+                        strokeDasharray={`${2 * Math.PI * 56}`}
+                      />
+                    )}
+                  </svg>
+                  <div className="absolute inset-[34px] rounded-full bg-slate-950/95 border border-slate-700/60 flex flex-col items-center justify-center text-center">
+                    <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Score</span>
+                    <span className="text-2xl font-extrabold text-white leading-none">
+                      {suitabilityLoading ? "--" : suitabilityScore}
+                    </span>
+                    <span className="text-slate-500 text-[10px] uppercase tracking-widest mt-1">/100</span>
+                  </div>
+                </div>
+
+                <div className="max-w-md">
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {suitabilityLoading
+                      ? "Calculating from risk, commute, affordability, preferences, and scheme eligibility..."
+                      : "This donut shows how much each factor contributes to the final score."}
+                  </p>
+                  {suitabilityError && (
+                    <p className="mt-2 text-amber-300 text-xs">Suitability calculator: {suitabilityError}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 lg:w-[420px]">
+                {suitabilitySlices.length ? (
+                  suitabilitySlices.map((item) => (
+                    <div
+                      key={item.label}
+                      className="flex items-center justify-between gap-4 rounded-xl border border-slate-700/50 bg-slate-900/40 px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span
+                          className="h-3.5 w-3.5 rounded-full shrink-0"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-white capitalize truncate">{item.label}</p>
+                          <p className="text-[11px] text-slate-400">
+                            Score {Math.round(item.score)}/100 · Weight {item.weight.toFixed(1)}%
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-primary text-sm font-extrabold">{item.contribution.toFixed(1)}</p>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-500">Contribution</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-xl border border-slate-700/50 bg-slate-900/40 p-4 text-slate-400 text-sm">
+                    {suitabilityLoading ? "Loading breakdown..." : "No suitability breakdown available yet."}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
 
         <section className="px-4 mt-8">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+            <span className="material-symbols-outlined text-primary">location_on</span>
+            Location & Accessibility
+          </h2>
           <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5 flex flex-col gap-4">
-            <h2 className="text-lg font-bold flex items-center gap-2 text-white">
-              <span className="material-symbols-outlined text-primary">location_on</span>
-              Location & Accessibility
-            </h2>
             <div className="flex flex-col gap-1">
               <p className="text-white font-semibold text-sm">{location?.address || `${property.Township}, ${property.Area}, ${property.State}`}</p>
               <p className="text-slate-500 text-xs tracking-wide">Coordinates: {location?.coordinates}</p>

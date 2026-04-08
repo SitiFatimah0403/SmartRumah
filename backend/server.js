@@ -14,6 +14,7 @@ const recommendationRoutes = require("./src/recommendation/routes");
 const propertyRoutes = require("./src/houses/property.routes");
 const riskRoutes = require("./src/riskDetection/risk.routes");
 const costCalculatorRoutes = require("./src/costCalculator/routes");
+const suitabilityRoutes = require("./src/suitabilityCalculator/suitability.routes");
 
 
 app.use(cors())
@@ -28,6 +29,7 @@ app.use("/recommendations", recommendationRoutes);
 app.use("/properties", propertyRoutes);
 app.use("/api", riskRoutes);
 app.use("/api", costCalculatorRoutes);
+app.use("/api", suitabilityRoutes);
 
 
 app.get("/", (req,res)=>{
