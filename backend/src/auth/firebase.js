@@ -1,41 +1,38 @@
-const fs = require("fs")
-const path = require("path")
-const admin = require("firebase-admin")
+const fs = require("fs");
+const path = require("path");
+const admin = require("firebase-admin");
 
 function getServiceAccount() {
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
-    try {
-      return JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON)
-    } catch (error) {
-      throw new Error("Invalid FIREBASE_SERVICE_ACCOUNT_JSON. Ensure it is valid JSON.")
-    }
+ 
+  if (
+    process.env.FIREBASE_PROJECT_ID &&
+    process.env.FIREBASE_CLIENT_EMAIL &&
+    process.env.FIREBASE_PRIVATE_KEY
+  ) {
+    return {
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    };
   }
 
-  const configuredPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH
-  const fallbackPath = path.join(__dirname, "firebaseKey.json")
-  const keyPath = configuredPath
-    ? path.isAbsolute(configuredPath)
-      ? configuredPath
-      : path.join(process.cwd(), configuredPath)
-    : fallbackPath
+  // ⚠️ fallback (LOCAL only)
+  const fallbackPath = path.join(__dirname, "firebaseKey.json");
 
-  if (!fs.existsSync(keyPath)) {
-    throw new Error(
-      "Firebase service account key not found. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_PATH."
-    )
+  if (!fs.existsSync(fallbackPath)) {
+    throw new Error("Firebase key not found");
   }
 
-  const fileContent = fs.readFileSync(keyPath, "utf8")
-  return JSON.parse(fileContent)
+  return JSON.parse(fs.readFileSync(fallbackPath, "utf8"));
 }
 
-const serviceAccount = getServiceAccount()
+const serviceAccount = getServiceAccount();
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-})
+});
 
 const auth = admin.auth();
-const db = admin.firestore()
+const db = admin.firestore();
 
-module.exports = { admin, db, auth }
+module.exports = { admin, db, auth };
