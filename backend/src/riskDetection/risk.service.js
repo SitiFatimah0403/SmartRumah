@@ -44,14 +44,14 @@ const processRisk = async (propertyId) => {
     }
 
     //SLOPE LOGIC - will be generated based on elevation - ni logic kita yang penting
-    let slope;
+    /*let slope;
     if (elevation < 50) {
       slope = "Low";
     } else if (elevation >= 50 && elevation <= 120) {
       slope = "Medium";
     } else {
       slope = "High";
-    } 
+    }*/ 
 
     //RAINFALL LOGIC - based on area
     let rainfall;
@@ -68,39 +68,71 @@ const processRisk = async (propertyId) => {
     }
 
     //FLOOD RISK LOGIC - if low elevation with high rainfall -> HIGH RISK
-    let floodRisk;
+    /*let floodRisk;
     if (elevation < 50 && rainfall > 2300) {
       floodRisk = "High";
     } else if (elevation < 100 && rainfall > 2000) {
       floodRisk = "Medium";
     } else {
       floodRisk = "Low";
-    }
+    }*/
 
     //LANDSLIDE RISK LOGIC - if high slope with high rainfall -> HIGH RISK
-    let landslideRisk;
+    /*let landslideRisk;
     if (slope === "High" && rainfall > 2300) {
       landslideRisk = "High";
     } else if (slope === "Medium" && rainfall > 2000) {
       landslideRisk = "Medium";
     } else {
       landslideRisk = "Low";
-    }
+    }*/
 
     //CONVERSION RISK TO SCORE LOGIC
-    const convertRiskToScore = (risk) => {
+    /*const convertRiskToScore = (risk) => {
       if (risk === "Low") return 20;
       if (risk === "Medium") return 50;
       if (risk === "High") return 80;
       return 0;
+    };*/
+
+    /*const floodScore = convertRiskToScore(floodRisk);
+    const landslideScore = convertRiskToScore(landslideRisk);
+    const averageRisk = (floodScore + landslideScore) / 2; //ambik average je between flood and slide*/
+
+    // NORMALIZATION FUNCTION
+    const normalize = (value, min, max) => {
+      return Math.max(0, Math.min(1, (value - min) / (max - min)));
     };
 
-    const floodScore = convertRiskToScore(floodRisk);
-    const landslideScore = convertRiskToScore(landslideRisk);
-    const averageRisk = (floodScore + landslideScore) / 2; //ambik average je between flood and slide
+    // CONTINUOUS FLOOD RISK
+    const rainNoise = Math.abs((lat + lng) % 1) * 100;
+    const adjustedRainfall = rainfall + rainNoise;
+
+    const rainFactor = normalize(adjustedRainfall, 2000, 2700);
+    const elevationFactor = 1 - normalize(elevation, 0, 150);
+
+    const floodScore = Math.min(100,
+      (rainFactor * 0.4 + elevationFactor * 0.6) * 100
+    );
+
+    // CONTINUOUS LANDSLIDE RISK
+    const slopeFactor = normalize(elevation, 0, 150);
+
+    const landslideScore = Math.min(100,
+      (slopeFactor * 0.7 + rainFactor * 0.3) * 100
+    );
+    
+    const averageRisk = ((floodScore + landslideScore) / 2) * 0.7;
+
+    // optional small variation (makes results nicer)
+    const geoVariation = Math.abs((lat * lng) % 1) * 5;
+
+    const safetyIndex = Math.max(
+      0,
+      Math.round(100 - averageRisk + geoVariation + 10)
+    );
 
     //SAFETY INDEX LOGIC
-    const safetyIndex = 100 - averageRisk;
     let safetyLevel;
     if (safetyIndex >= 80) {
       safetyLevel = "Safe";
@@ -112,6 +144,15 @@ const processRisk = async (propertyId) => {
       safetyLevel = "High Risk";
     }
 
+    const getRiskLevel = (score) => {
+    if (score < 30) return "Low";
+    if (score < 60) return "Medium";
+    return "High";
+    };
+
+    const floodRisk = getRiskLevel(floodScore);
+    const landslideRisk = getRiskLevel(landslideScore);
+
     //RETURN ALL DATA
     return {
       propertyId,
@@ -120,7 +161,7 @@ const processRisk = async (propertyId) => {
       lng,
       area,
       elevation,
-      slope,
+      //slope,
       rainfall,
       floodRisk,
       landslideRisk,
