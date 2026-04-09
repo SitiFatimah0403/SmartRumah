@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildRecommendationUser, getAuthenticatedProfile, getDisplayName } from "./userPayload";
 
 export default function AllHousingScheme() {
   const navigate = useNavigate();
@@ -26,38 +27,21 @@ export default function AllHousingScheme() {
   async function fetchData() {
     try {
       //ni TUKAR
-      const user = {
-      personalInfo: {
-        age: 25,
-      },
-      employmentDetails: {
-        workplaceLat: 3.1319,
-        workplaceLng: 101.6841,
-      },
-      propertyPreferences: {
-        preferredState: "Kuala Lumpur",
-        maxBudget: 500000,
-      },
-      eligibility: {
-        householdIncome: 5000,
-        firstTimeHomebuyer: true,
-      },
-    };
+     const profileData = await getAuthenticatedProfile();
+    const userPayload = buildRecommendationUser(profileData);
     
       const API_URL = import.meta.env.VITE_API_URL;
 
       const res = await fetch(`${API_URL}/housing-schemes/eligible`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userPayload),
     });
 
       const data = await res.json();
 
       console.log("API RESPONSE:", data); 
-      setProperties(data.matchingProjects);
+      setProperties(data.matchingProjects || []);
 
     } catch (err) {
       console.error(err);
