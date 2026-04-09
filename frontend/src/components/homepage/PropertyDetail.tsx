@@ -185,7 +185,7 @@ export default function PropertyDetail() {
           }
 
           let suitabilityRes = await fetch(
-            "http://localhost:5000/api/calculate-suitability",
+            `${API_URL}/api/calculate-suitability`,
             {
               method: "POST",
               headers: {
@@ -201,7 +201,7 @@ export default function PropertyDetail() {
             localStorage.setItem("token", refreshedToken);
 
             suitabilityRes = await fetch(
-              "http://localhost:5000/api/calculate-suitability",
+              `${API_URL}/api/calculate-suitability`,
               {
                 method: "POST",
                 headers: {
@@ -244,7 +244,7 @@ export default function PropertyDetail() {
           );
 
           const trueCostRes = await fetch(
-            "http://localhost:5000/api/calculate-true-cost",
+            `${API_URL}/api/calculate-true-cost`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
