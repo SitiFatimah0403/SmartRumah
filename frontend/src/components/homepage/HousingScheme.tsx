@@ -4,6 +4,7 @@ import { buildRecommendationUser, getAuthenticatedProfile, getDisplayName } from
 
 export default function HousingScheme() {
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
   const [selectedScheme, setSelectedScheme] = useState("all");
   const [favorites, setFavorites] = useState<number[]>([]);
   const [profile, setProfile] = useState<any>(null);
@@ -13,6 +14,7 @@ export default function HousingScheme() {
     { id: "pr1ma", label: "PR1MA" },
     { id: "rumawip", label: "RUMAWIP" },
     { id: "selangorku", label: "Selangorku" },
+    { id: "myhome", label: "MyHome" },
   ];
 
   const [properties, setProperties] = useState<any[]>([]);
@@ -57,8 +59,6 @@ export default function HousingScheme() {
         setProfile(profileData);
 
         const userPayload = buildRecommendationUser(profileData);
-
-        const API_URL = import.meta.env.VITE_API_URL;
 
         const res = await fetch(`${API_URL}/housing-schemes/eligible`, {
           method: "POST",
