@@ -163,8 +163,10 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
         return;
       }
 
+      const API_URL = import.meta.env.VITE_API_URL;
+
       try {
-        const res = await fetch("http://localhost:5000/users/me", {
+        const res = await fetch(`${API_URL}/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -1031,7 +1033,9 @@ export default function ProfileEdit({ activeSection = "all" }: ProfileEditProps)
                   },
                 };
 
-                const res = await fetch("http://localhost:5000/users/update-profile", {
+                const API_URL = import.meta.env.VITE_API_URL;
+
+                const res = await fetch(`${API_URL}/users/update-profile`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

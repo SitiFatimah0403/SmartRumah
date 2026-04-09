@@ -11,6 +11,7 @@ export default function SmartRumahCombined() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2200);
@@ -29,7 +30,7 @@ export default function SmartRumahCombined() {
       localStorage.setItem("token", token);
 
       // send token to backend
-      const res = await fetch("http://localhost:5000/auth/me", {
+      const res = await fetch(`${API_URL}/auth/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -54,7 +55,7 @@ export default function SmartRumahCombined() {
       const token = await result.user.getIdToken();
       localStorage.setItem("token", token);
 
-      const res = await fetch("http://localhost:5000/auth/me", {
+      const res = await fetch(`${API_URL}/auth/me`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

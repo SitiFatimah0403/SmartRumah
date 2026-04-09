@@ -271,8 +271,9 @@ function handleSearch(value: string) {
     localStorage.setItem("token", token);
 
     const uid = userCredential.user.uid;
+    const API_URL = import.meta.env.VITE_API_URL;
 
-    const res = await fetch("http://localhost:5000/users/update-profile", {
+    const res = await fetch(`${API_URL}/users/update-profile`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

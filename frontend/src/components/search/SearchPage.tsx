@@ -142,10 +142,12 @@ const handleAreaClick = (areaName: string) => {
     setSavedItems(saved.map((p: any) => String(p.Property_ID)));
   }, []);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const res = await fetch("http://localhost:5000/houses");
+        const res = await fetch(`${API_URL}/houses`);
         const data = await res.json();
 
         setProperties(Array.isArray(data) ? data : []);
@@ -201,7 +203,7 @@ const handleAreaClick = (areaName: string) => {
 
   const fetchRiskForProperty = useCallback(async (id: string) => {
     try {
-      const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+      const riskRes = await fetch(`${API_URL}/api/analyze-risk`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

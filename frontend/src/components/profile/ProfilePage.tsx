@@ -27,6 +27,8 @@ export default function ProfilePage() {
     return String(value);
   };
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const loadProfile = async () => {
       let token = localStorage.getItem("token");
@@ -42,7 +44,7 @@ export default function ProfilePage() {
       }
 
       try {
-        let res = await fetch("http://localhost:5000/users/me", {
+        let res = await fetch(`${API_URL}/users/me`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -54,7 +56,7 @@ export default function ProfilePage() {
             const refreshedToken = await auth.currentUser.getIdToken(true);
             localStorage.setItem("token", refreshedToken);
 
-            res = await fetch("http://localhost:5000/users/me", {
+            res = await fetch(`${API_URL}/users/me`, {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${refreshedToken}`,

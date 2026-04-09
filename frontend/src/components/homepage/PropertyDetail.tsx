@@ -105,7 +105,7 @@ export default function PropertyDetail() {
     console.log("UPDATED FROM DETAIL:", updated);
   };
   
-
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     async function fetchData() {
@@ -116,14 +116,14 @@ export default function PropertyDetail() {
         let propertyData = null;
 
       // Try regular houses
-      const res1 = await fetch(`http://localhost:5000/houses/${id}`);
+      const res1 = await fetch(`${API_URL}/houses/${id}`);
       if (res1.ok) {
         propertyData = await res1.json();
       }
 
       // If not found, try housing schemes
       if (!propertyData) {
-        const res2 = await fetch(`http://localhost:5000/housing-schemes/${id}`);
+        const res2 = await fetch(`${API_URL}/housing-schemes/${id}`);
         if (res2.ok) {
           propertyData = await res2.json();
         }
@@ -148,12 +148,12 @@ export default function PropertyDetail() {
 
         // Fetch location (lat lng)
         const locationRes = await fetch(
-          `http://localhost:5000/map/property/${id}`
+          `${API_URL}/map/property/${id}`
         );
         const locationData = await locationRes.json();
         setLocation(locationData);
         //fetch risk
-        const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+        const riskRes = await fetch(`${API_URL}/api/analyze-risk`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

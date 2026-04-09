@@ -27,9 +27,11 @@ export default function SavedPage() {
     setSavedProperties(getSavedProperties());
   }, []);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const fetchRiskForProperty = useCallback(async (id: string) => {
     try {
-      const riskRes = await fetch("http://localhost:5000/api/analyze-risk", {
+      const riskRes = await fetch(`${API_URL}/api/analyze-risk`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

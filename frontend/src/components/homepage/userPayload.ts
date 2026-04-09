@@ -12,7 +12,9 @@ export async function getAuthenticatedProfile() {
     return null;
   }
 
-  let res = await fetch("http://localhost:5000/users/me", {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  let res = await fetch(`${API_URL}/users/me`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -23,7 +25,7 @@ export async function getAuthenticatedProfile() {
     const refreshedToken = await auth.currentUser.getIdToken(true);
     localStorage.setItem("token", refreshedToken);
 
-    res = await fetch("http://localhost:5000/users/me", {
+    res = await fetch(`${API_URL}/users/me`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${refreshedToken}`,

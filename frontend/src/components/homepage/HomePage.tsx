@@ -28,7 +28,9 @@ export default function HomeDashboard() {
 
         const userPayload = buildRecommendationUser(profileData);
 
-        const res = await fetch("http://localhost:5000/recommendations", {
+        const API_URL = import.meta.env.VITE_API_URL;
+
+        const res = await fetch(`${API_URL}/recommendations`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
